@@ -361,7 +361,7 @@
 
       
         
-          <h1 id="bugku-pwn"><a href="#bugku-pwn" class="headerlink" title="bugku pwn"></a>bugku pwn</h1><h2 id="pwn2"><a href="#pwn2" class="headerlink" title="pwn2"></a>pwn2</h2>
+          <h1 id="bugku-pwn"><a href="#bugku-pwn" class="headerlink" title="bugku pwn"></a>bugku pwn</h1>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2019/12/25/bugku/#more" rel="contents">
@@ -485,7 +485,7 @@
 
       
         
-          <h1 id="协议层攻击之HTTP请求走私"><a href="#协议层攻击之HTTP请求走私" class="headerlink" title="协议层攻击之HTTP请求走私"></a>协议层攻击之HTTP请求走私</h1><h2 id="0x01-HTTP请求走私是什么"><a href="#0x01-HTTP请求走私是什么" class="headerlink" title="0x01 HTTP请求走私是什么"></a>0x01 HTTP请求走私是什么</h2><p>HTTP请求走私是一种干扰网站处理从一个或多个用户接收的HTTP请求序列的方式的技术。使攻击者可以绕过安全控制，未经授权访问敏感数据并直接危害其他应用程序用户。</p>
+          <h1 id="协议层攻击之HTTP请求走私"><a href="#协议层攻击之HTTP请求走私" class="headerlink" title="协议层攻击之HTTP请求走私"></a>协议层攻击之HTTP请求走私</h1>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2019/12/25/http-smuggle/#more" rel="contents">
@@ -609,10 +609,7 @@
 
       
         
-          <h1 id="jwt基础知识"><a href="#jwt基础知识" class="headerlink" title="jwt基础知识"></a>jwt基础知识</h1><h2 id="JSON-web-token是什么"><a href="#JSON-web-token是什么" class="headerlink" title="JSON web token是什么"></a>JSON web token是什么</h2><ul>
-<li>JSON Web Token (JWT)是一个开放标准(RFC 7519)，它定义了一种紧凑的、自包含的方式，用于作为JSON对象在各方之间安全地传输信息。该信息可以被验证和信任，因为它是数字签名的。<h2 id="什么时候你应该用JSON-Web-Tokens"><a href="#什么时候你应该用JSON-Web-Tokens" class="headerlink" title="什么时候你应该用JSON Web Tokens"></a>什么时候你应该用JSON Web Tokens</h2>下列场景中使用JSON Web Token是很有用的：</li>
-<li>Authorization (授权) : 这是使用JWT的最常见场景。一旦用户登录，后续每个请求都将包含JWT，允许用户访问该令牌允许的路由、服务和资源。单点登录是现在广泛使用的JWT的一个特性，因为它的开销很小，并且可以轻松地跨域使用。</li>
-<li>Information Exchange (信息交换) : 对于安全的在各方之间传输信息而言，JSON Web Tokens无疑是一种很好的方式。因为JWTs可以被签名，例如，用公钥/私钥对，你可以确定发送人就是它们所说的那个人。另外，由于签名是使用头和有效负载计算的，您还可以验证内容没有被篡改。
+          <h1 id="jwt基础知识"><a href="#jwt基础知识" class="headerlink" title="jwt基础知识"></a>jwt基础知识</h1>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2019/12/25/jwt/#more" rel="contents">
@@ -622,7 +619,7 @@
           <!--/noindex-->
         
       
-    </li></ul></div>
+    </div>
     
     
     
@@ -986,14 +983,7 @@
 
       
         
-          <h1 id="pwn-heap"><a href="#pwn-heap" class="headerlink" title="pwn-heap"></a>pwn-heap</h1><h2 id="什么是堆"><a href="#什么是堆" class="headerlink" title="什么是堆"></a>什么是堆</h2><p>在程序运行过程中，堆可以提供动态分配的内存，允许程序申请大小未知的内存。堆其实就是程序虚拟地址空间的一块连续的线性区域，它由低地址向高地址方向增长。我们一般称管理堆的那部分程序为堆管理器.</p>
-<p>堆管理器处于用户程序与内核中间，主要做以下工作:</p>
-<ul>
-<li>响应用户的申请内存请求，向操作系统申请内存，然后将其返回给用户程序。同时，为了保持内存管理的高效性，内核一般都会预先分配很大的一块连续的内存，然后让堆管理器通过某种算法管理这块内存。只有当出现了堆空间不足的情况，堆管理器才会再次与操作系统进行交互。</li>
-<li>管理用户所释放的内存。一般来说，用户释放的内存并不是直接返还给操作系统的，而是由堆管理器进行管理。这些释放的内存可以来响应用户新申请的内存的请求。</li>
-</ul>
-<p>目前 Linux 标准发行版中使用的堆分配器是 glibc 中的堆分配器：ptmalloc2。ptmalloc2 主要是通过 malloc/free 函数来分配和释放内存块。</p>
-<p>需要注意的是，在内存分配与使用的过程中，Linux 有这样的一个基本内存管理思想，只有当真正访问一个地址的时候，系统才会建立虚拟页面与物理页面的映射关系。 所以虽然操作系统已经给程序分配了很大的一块内存，但是这块内存其实只是虚拟内存。只有当用户使用到相应的内存时，系统才会真正分配物理页面给用户使用。</p>
+          <h1 id="pwn-heap"><a href="#pwn-heap" class="headerlink" title="pwn-heap"></a>pwn-heap</h1>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2019/12/25/heap/#more" rel="contents">
@@ -1241,8 +1231,7 @@
 
       
         
-          <h1 id="关于phar反序列化"><a href="#关于phar反序列化" class="headerlink" title="关于phar反序列化"></a>关于phar反序列化</h1><h2 id="phar反序列化"><a href="#phar反序列化" class="headerlink" title="phar反序列化"></a>phar反序列化</h2><ul>
-<li>简单的说，phar就是php的压缩文件，它可以把多个文件归档到同一个文件中，而且不经过解压就能被 php 访问并执行，与file:// ，php://等类似，也是一种流包装器。
+          <h1 id="关于phar反序列化"><a href="#关于phar反序列化" class="headerlink" title="关于phar反序列化"></a>关于phar反序列化</h1>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2019/12/25/反序列化/#more" rel="contents">
@@ -1252,7 +1241,7 @@
           <!--/noindex-->
         
       
-    </li></ul></div>
+    </div>
     
     
     
@@ -1366,8 +1355,7 @@
 
       
         
-          <h1 id="模板注入"><a href="#模板注入" class="headerlink" title="模板注入"></a>模板注入</h1><h2 id="模板注入与常见web注入"><a href="#模板注入与常见web注入" class="headerlink" title="模板注入与常见web注入"></a>模板注入与常见web注入</h2><ul>
-<li><p>就注入类型的漏洞来说，常见 Web 注入有：SQL 注入，XSS 注入，XPATH 注入，XML 注入，代码注入，命令注入等等。注入漏洞的实质是服务端接受了用户的输入，未过滤或过滤不严谨执行了拼接了用户输入的代码，因此造成了各类注入。下面这段代码足以说明这一点：</p>
+          <h1 id="模板注入"><a href="#模板注入" class="headerlink" title="模板注入"></a>模板注入</h1>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2019/12/25/模板注入/#more" rel="contents">
@@ -1377,7 +1365,7 @@
           <!--/noindex-->
         
       
-    </li></ul></div>
+    </div>
     
     
     
@@ -2012,3 +2000,5 @@
 
 </body>
 </html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

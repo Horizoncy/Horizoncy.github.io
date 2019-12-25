@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="bugku pwnpwn2">
+<meta name="description" content="bugku pwn">
 <meta name="keywords" content="pwn">
 <meta property="og:type" content="article">
 <meta property="og:title" content="bugku pwn">
 <meta property="og:url" content="https://Horizoncy.github.io/2019/12/25/bugku/index.html">
 <meta property="og:site_name" content="Horizon&#39;s Security Notes">
-<meta property="og:description" content="bugku pwnpwn2">
+<meta property="og:description" content="bugku pwn">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-12-25T10:27:44.182Z">
+<meta property="og:updated_time" content="2019-12-25T10:58:33.276Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="bugku pwn">
-<meta name="twitter:description" content="bugku pwnpwn2">
+<meta name="twitter:description" content="bugku pwn">
 
 
 
@@ -362,8 +362,8 @@
       
 
       
-        <h1 id="bugku-pwn"><a href="#bugku-pwn" class="headerlink" title="bugku pwn"></a>bugku pwn</h1><h2 id="pwn2"><a href="#pwn2" class="headerlink" title="pwn2"></a>pwn2</h2><a id="more"></a>
-<ul>
+        <h1 id="bugku-pwn"><a href="#bugku-pwn" class="headerlink" title="bugku pwn"></a>bugku pwn</h1><a id="more"></a>
+<h2 id="pwn2"><a href="#pwn2" class="headerlink" title="pwn2"></a>pwn2</h2><ul>
 <li>checksec发现什么保护都没有,拖进ida看看.<br>main函数<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">&#123;</span><br><span class="line">  char s; // [rsp+0h] [rbp-30h]</span><br><span class="line"></span><br><span class="line">  memset(&amp;s, 0, 0x30uLL);</span><br><span class="line">  setvbuf(stdout, 0LL, 2, 0LL);</span><br><span class="line">  setvbuf(stdin, 0LL, 1, 0LL);</span><br><span class="line">  puts(&quot;say something?&quot;);</span><br><span class="line">  read(0, &amp;s, 0x100uLL);</span><br><span class="line">  puts(&quot;oh,that&apos;s so boring!&quot;);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 </li>
@@ -1092,3 +1092,5 @@
 
 </body>
 </html>
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
