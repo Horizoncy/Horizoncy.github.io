@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="协议层攻击之HTTP请求走私0x01 HTTP请求走私是什么HTTP请求走私是一种干扰网站处理从一个或多个用户接收的HTTP请求序列的方式的技术。使攻击者可以绕过安全控制，未经授权访问敏感数据并直接危害其他应用程序用户。 0x02 为什么会产生HTTP请求走私 请求走私漏洞成因前端服务器(CDN)和后端服务器接收数据不同步，引起对客户端传入的数据理解不一致，从而导致漏洞的产生。大多数HTTP请求走">
+<meta name="description" content="协议层攻击之HTTP请求走私0x01 HTTP请求走私是什么HTTP请求走私是一种干扰网站处理从一个或多个用户接收的HTTP请求序列的方式的技术。使攻击者可以绕过安全控制，未经授权访问敏感数据并直接危害其他应用程序用户。">
 <meta name="keywords" content="web">
 <meta property="og:type" content="article">
 <meta property="og:title" content="http-smuggle">
 <meta property="og:url" content="https://Horizoncy.github.io/2019/12/25/http-smuggle/index.html">
 <meta property="og:site_name" content="Horizon&#39;s Security Notes">
-<meta property="og:description" content="协议层攻击之HTTP请求走私0x01 HTTP请求走私是什么HTTP请求走私是一种干扰网站处理从一个或多个用户接收的HTTP请求序列的方式的技术。使攻击者可以绕过安全控制，未经授权访问敏感数据并直接危害其他应用程序用户。 0x02 为什么会产生HTTP请求走私 请求走私漏洞成因前端服务器(CDN)和后端服务器接收数据不同步，引起对客户端传入的数据理解不一致，从而导致漏洞的产生。大多数HTTP请求走">
+<meta property="og:description" content="协议层攻击之HTTP请求走私0x01 HTTP请求走私是什么HTTP请求走私是一种干扰网站处理从一个或多个用户接收的HTTP请求序列的方式的技术。使攻击者可以绕过安全控制，未经授权访问敏感数据并直接危害其他应用程序用户。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-12-25T10:19:20.936Z">
+<meta property="og:updated_time" content="2019-12-25T10:27:24.885Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="http-smuggle">
-<meta name="twitter:description" content="协议层攻击之HTTP请求走私0x01 HTTP请求走私是什么HTTP请求走私是一种干扰网站处理从一个或多个用户接收的HTTP请求序列的方式的技术。使攻击者可以绕过安全控制，未经授权访问敏感数据并直接危害其他应用程序用户。 0x02 为什么会产生HTTP请求走私 请求走私漏洞成因前端服务器(CDN)和后端服务器接收数据不同步，引起对客户端传入的数据理解不一致，从而导致漏洞的产生。大多数HTTP请求走">
+<meta name="twitter:description" content="协议层攻击之HTTP请求走私0x01 HTTP请求走私是什么HTTP请求走私是一种干扰网站处理从一个或多个用户接收的HTTP请求序列的方式的技术。使攻击者可以绕过安全控制，未经授权访问敏感数据并直接危害其他应用程序用户。">
 
 
 
@@ -363,15 +363,14 @@
 
       
         <h1 id="协议层攻击之HTTP请求走私"><a href="#协议层攻击之HTTP请求走私" class="headerlink" title="协议层攻击之HTTP请求走私"></a>协议层攻击之HTTP请求走私</h1><h2 id="0x01-HTTP请求走私是什么"><a href="#0x01-HTTP请求走私是什么" class="headerlink" title="0x01 HTTP请求走私是什么"></a>0x01 HTTP请求走私是什么</h2><p>HTTP请求走私是一种干扰网站处理从一个或多个用户接收的HTTP请求序列的方式的技术。使攻击者可以绕过安全控制，未经授权访问敏感数据并直接危害其他应用程序用户。</p>
-<h2 id="0x02-为什么会产生HTTP请求走私"><a href="#0x02-为什么会产生HTTP请求走私" class="headerlink" title="0x02 为什么会产生HTTP请求走私"></a>0x02 为什么会产生HTTP请求走私</h2><ul>
-<li><p>请求走私漏洞成因<br>前端服务器(CDN)和后端服务器接收数据不同步，引起对客户端传入的数据理解不一致，从而导致漏洞的产生。<br>大多数HTTP请求走私漏洞的出现是因为HTTP规范提供了两种不同的方法来指定请求的结束位置：<code>Content-Length</code>标头和<code>Transfer-Encoding</code>标头。<br>同时使用两种不同的方法时，<code>Content-Length</code>无效。当使用多个服务器时，对客户端传入的数据理解不一致时，就会出现有些服务器认为<code>Content-Length</code>的长度有效，有些以<code>Transfer-Encoding</code>有效。而一般情况下，反向代理服务器与后端的源站服务器之间，会重用TCP链接。这样超出的长度就会拼接到下一次请求进行请求，从而导致HTTP请求走私漏洞。</p>
-</li>
-<li><p>RFC2616规范<br>如果接收的消息同时包含传输编码头字段(Transfer-Encoding)和内容长度头(Content-Length)字段，则必须忽略后者。<br>由于规范默许可以使用<code>Transfer-Encoding</code>和<code>Content-Length</code>处理请求，因此很少有服务器拒绝此类请求。每当我们找到一种方法，将<code>Transfer-Encoding</code>隐藏在服务端的一个chain中时，它将会回退到使用<code>Content-Length</code>去发送请求。</p>
-</li>
-<li><p>走私攻击实现<br>当向代理服务器发送一个比较模糊的HTTP请求时，由于两者服务器的实现方式不同，代理服务器可能认为这是一个HTTP请求，然后将其转发给了后端的源站服务器，但源站服务器经过解析处理后，只认为其中的一部分为正常请求，剩下的那一部分，就算是走私的请求，当该部分对正常用户的请求造成了影响之后，就实现了HTTP走私攻击。</p>
 <a id="more"></a>
+<h2 id="0x02-为什么会产生HTTP请求走私"><a href="#0x02-为什么会产生HTTP请求走私" class="headerlink" title="0x02 为什么会产生HTTP请求走私"></a>0x02 为什么会产生HTTP请求走私</h2><ul>
+<li>请求走私漏洞成因<br>前端服务器(CDN)和后端服务器接收数据不同步，引起对客户端传入的数据理解不一致，从而导致漏洞的产生。<br>大多数HTTP请求走私漏洞的出现是因为HTTP规范提供了两种不同的方法来指定请求的结束位置：<code>Content-Length</code>标头和<code>Transfer-Encoding</code>标头。<br>同时使用两种不同的方法时，<code>Content-Length</code>无效。当使用多个服务器时，对客户端传入的数据理解不一致时，就会出现有些服务器认为<code>Content-Length</code>的长度有效，有些以<code>Transfer-Encoding</code>有效。而一般情况下，反向代理服务器与后端的源站服务器之间，会重用TCP链接。这样超出的长度就会拼接到下一次请求进行请求，从而导致HTTP请求走私漏洞。</li>
+<li>RFC2616规范<br>如果接收的消息同时包含传输编码头字段(Transfer-Encoding)和内容长度头(Content-Length)字段，则必须忽略后者。<br>由于规范默许可以使用<code>Transfer-Encoding</code>和<code>Content-Length</code>处理请求，因此很少有服务器拒绝此类请求。每当我们找到一种方法，将<code>Transfer-Encoding</code>隐藏在服务端的一个chain中时，它将会回退到使用<code>Content-Length</code>去发送请求。</li>
+<li>走私攻击实现<br>当向代理服务器发送一个比较模糊的HTTP请求时，由于两者服务器的实现方式不同，代理服务器可能认为这是一个HTTP请求，然后将其转发给了后端的源站服务器，但源站服务器经过解析处理后，只认为其中的一部分为正常请求，剩下的那一部分，就算是走私的请求，当该部分对正常用户的请求造成了影响之后，就实现了HTTP走私攻击。</li>
+</ul>
 <h2 id="0x03-如何执行HTTP请求走私攻击"><a href="#0x03-如何执行HTTP请求走私攻击" class="headerlink" title="0x03 如何执行HTTP请求走私攻击"></a>0x03 如何执行HTTP请求走私攻击</h2><p>HTTP请求走私攻击涉及将Content-Length标头和Transfer-Encoding标头都放置在单个HTTP请求中并进行处理，以便前端服务器和后端服务器以不同的方式处理请求。完成此操作的确切方式取决于两个服务器的行为：</p>
-</li>
+<ul>
 <li><p>CL.TE：前端服务器使用Content-Length标头，而后端服务器使用Transfer-Encoding标头。</p>
 </li>
 <li><p>TE.CL：前端服务器使用Transfer-Encoding标头，而后端服务器使用Content-Length标头。</p>
@@ -715,6 +714,8 @@
   
 
 
+  
+
 
 
 
@@ -753,6 +754,11 @@
   
   
     <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
   
 
 
