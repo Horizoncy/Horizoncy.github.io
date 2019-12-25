@@ -79,17 +79,17 @@
 
 
 
-<meta name="description" content="title:bugku pwnbugku pwnpwn2 checksec发现什么保护都没有,拖进ida看看.main函数123456789101112int __cdecl main(int argc, const char **argv, const char **envp)&amp;#123;  char s; // [rsp+0h] [rbp-30h]  memset(&amp;amp;s, 0, 0x">
+<meta name="description" content="bugku pwnpwn2 checksec发现什么保护都没有,拖进ida看看.main函数123456789101112int __cdecl main(int argc, const char **argv, const char **envp)&amp;#123;  char s; // [rsp+0h] [rbp-30h]  memset(&amp;amp;s, 0, 0x30uLL);  setvbuf">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Horizon&#39;s Security Notes">
+<meta property="og:title" content="Hexo - bugku pwn">
 <meta property="og:url" content="https://Horizoncy.github.io/2019/12/25/bugku/index.html">
 <meta property="og:site_name" content="Horizon&#39;s Security Notes">
-<meta property="og:description" content="title:bugku pwnbugku pwnpwn2 checksec发现什么保护都没有,拖进ida看看.main函数123456789101112int __cdecl main(int argc, const char **argv, const char **envp)&amp;#123;  char s; // [rsp+0h] [rbp-30h]  memset(&amp;amp;s, 0, 0x">
+<meta property="og:description" content="bugku pwnpwn2 checksec发现什么保护都没有,拖进ida看看.main函数123456789101112int __cdecl main(int argc, const char **argv, const char **envp)&amp;#123;  char s; // [rsp+0h] [rbp-30h]  memset(&amp;amp;s, 0, 0x30uLL);  setvbuf">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-12-25T09:51:49.100Z">
+<meta property="og:updated_time" content="2019-12-25T09:58:30.617Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Horizon&#39;s Security Notes">
-<meta name="twitter:description" content="title:bugku pwnbugku pwnpwn2 checksec发现什么保护都没有,拖进ida看看.main函数123456789101112int __cdecl main(int argc, const char **argv, const char **envp)&amp;#123;  char s; // [rsp+0h] [rbp-30h]  memset(&amp;amp;s, 0, 0x">
+<meta name="twitter:title" content="Hexo - bugku pwn">
+<meta name="twitter:description" content="bugku pwnpwn2 checksec发现什么保护都没有,拖进ida看看.main函数123456789101112int __cdecl main(int argc, const char **argv, const char **envp)&amp;#123;  char s; // [rsp+0h] [rbp-30h]  memset(&amp;amp;s, 0, 0x30uLL);  setvbuf">
 
 
 
@@ -125,7 +125,7 @@
 
 
 
-  <title> | Horizon's Security Notes</title>
+  <title>Hexo - bugku pwn | Horizon's Security Notes</title>
   
 
 
@@ -311,7 +311,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline"></h1>
+          <h1 class="post-title" itemprop="name headline">Hexo - bugku pwn</h1>
         
 
         <div class="post-meta">
@@ -361,8 +361,7 @@
       
 
       
-        <hr>
-<h2 id="title-bugku-pwn"><a href="#title-bugku-pwn" class="headerlink" title="title:bugku pwn"></a>title:bugku pwn</h2><h1 id="bugku-pwn"><a href="#bugku-pwn" class="headerlink" title="bugku pwn"></a>bugku pwn</h1><h2 id="pwn2"><a href="#pwn2" class="headerlink" title="pwn2"></a>pwn2</h2><ul>
+        <h1 id="bugku-pwn"><a href="#bugku-pwn" class="headerlink" title="bugku pwn"></a>bugku pwn</h1><h2 id="pwn2"><a href="#pwn2" class="headerlink" title="pwn2"></a>pwn2</h2><ul>
 <li>checksec发现什么保护都没有,拖进ida看看.<br>main函数<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">int __cdecl main(int argc, const char **argv, const char **envp)</span><br><span class="line">&#123;</span><br><span class="line">  char s; // [rsp+0h] [rbp-30h]</span><br><span class="line"></span><br><span class="line">  memset(&amp;s, 0, 0x30uLL);</span><br><span class="line">  setvbuf(stdout, 0LL, 2, 0LL);</span><br><span class="line">  setvbuf(stdin, 0LL, 1, 0LL);</span><br><span class="line">  puts(&quot;say something?&quot;);</span><br><span class="line">  read(0, &amp;s, 0x100uLL);</span><br><span class="line">  puts(&quot;oh,that&apos;s so boring!&quot;);</span><br><span class="line">  return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 </li>
@@ -428,8 +427,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/12/25/heap/" rel="prev" title>
-                 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/12/25/heap/" rel="prev" title="Hexo - heap">
+                Hexo - heap <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -544,7 +543,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#title-bugku-pwn"><span class="nav-number">1.</span> <span class="nav-text">title:bugku pwn</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#bugku-pwn"><span class="nav-number"></span> <span class="nav-text">bugku pwn</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pwn2"><span class="nav-number">1.</span> <span class="nav-text">pwn2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pwn4"><span class="nav-number">2.</span> <span class="nav-text">pwn4</span></a></li></ol></li></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#bugku-pwn"><span class="nav-number">1.</span> <span class="nav-text">bugku pwn</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pwn2"><span class="nav-number">1.1.</span> <span class="nav-text">pwn2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pwn4"><span class="nav-number">1.2.</span> <span class="nav-text">pwn4</span></a></li></ol></li></ol></div>
             
 
           </div>
