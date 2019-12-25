@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="pwntools pwntools是一个二进制利用框架。(别问我为什么转pwn,web打不下去了好吧). Pwntools的“Hello World” 栈溢出无疑是二进制攻击的“Hello World”。这里，我们用pwnable.kr的bof来进行展示。 123456789101112131415161718#include &amp;lt;stdio.h&amp;gt;#include &amp;lt;string.">
+<meta name="description" content="pwntools pwntools是一个二进制利用框架。(别问我为什么转pwn,web打不下去了好吧)可以方便有效的帮助我们编写exp。">
 <meta name="keywords" content="pwn">
 <meta property="og:type" content="article">
 <meta property="og:title" content="pwntools">
 <meta property="og:url" content="https://Horizoncy.github.io/2019/12/25/pwntools/index.html">
 <meta property="og:site_name" content="Horizon&#39;s Security Notes">
-<meta property="og:description" content="pwntools pwntools是一个二进制利用框架。(别问我为什么转pwn,web打不下去了好吧). Pwntools的“Hello World” 栈溢出无疑是二进制攻击的“Hello World”。这里，我们用pwnable.kr的bof来进行展示。 123456789101112131415161718#include &amp;lt;stdio.h&amp;gt;#include &amp;lt;string.">
+<meta property="og:description" content="pwntools pwntools是一个二进制利用框架。(别问我为什么转pwn,web打不下去了好吧)可以方便有效的帮助我们编写exp。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-12-25T10:08:50.148Z">
+<meta property="og:updated_time" content="2019-12-25T10:21:09.160Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="pwntools">
-<meta name="twitter:description" content="pwntools pwntools是一个二进制利用框架。(别问我为什么转pwn,web打不下去了好吧). Pwntools的“Hello World” 栈溢出无疑是二进制攻击的“Hello World”。这里，我们用pwnable.kr的bof来进行展示。 123456789101112131415161718#include &amp;lt;stdio.h&amp;gt;#include &amp;lt;string.">
+<meta name="twitter:description" content="pwntools pwntools是一个二进制利用框架。(别问我为什么转pwn,web打不下去了好吧)可以方便有效的帮助我们编写exp。">
 
 
 
@@ -363,7 +363,8 @@
 
       
         <h1 id="pwntools"><a href="#pwntools" class="headerlink" title="pwntools"></a>pwntools</h1><ul>
-<li><p>pwntools是一个二进制利用框架。(别问我为什么转pwn,web打不下去了好吧).</p>
+<li><p>pwntools是一个二进制利用框架。(别问我为什么转pwn,web打不下去了好吧)可以方便有效的帮助我们编写exp。</p>
+<a id="more"></a>
 <h2 id="Pwntools的“Hello-World”"><a href="#Pwntools的“Hello-World”" class="headerlink" title="Pwntools的“Hello World”"></a>Pwntools的“Hello World”</h2></li>
 <li><p>栈溢出无疑是二进制攻击的“Hello World”。这里，我们用pwnable.kr的bof来进行展示。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">void func(int key)&#123;</span><br><span class="line">    char overflowme[32];</span><br><span class="line">    printf(&quot;overflow me : &quot;);</span><br><span class="line">    gets(overflowme);    // smash me!</span><br><span class="line">    if(key == 0xcafebabe)&#123;</span><br><span class="line">        system(&quot;/bin/sh&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    else&#123;</span><br><span class="line">        printf(&quot;Nah..\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">int main(int argc, char* argv[])&#123;</span><br><span class="line">    func(0xdeadbeef);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -434,8 +435,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/12/25/代码审计/" rel="next" title="代码审计">
-                <i class="fa fa-chevron-left"></i> 代码审计
+              <a href="/2019/12/25/heap/" rel="next" title="heap">
+                <i class="fa fa-chevron-left"></i> heap
               </a>
             
           </div>

