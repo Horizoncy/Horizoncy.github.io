@@ -79,17 +79,17 @@
 
 
 
-<meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta name="description" content="pwnable.kr 一个pwn平台.别问我为什么换方向了.刷题记录.雄关漫道真如铁,而今迈步从头越.fd 我们首先看到这道题的C源码：123456789101112131415161718192021#include &amp;lt;stdio.h&amp;gt;#include &amp;lt;stdlib.h&amp;gt;#include &amp;lt;string.h&amp;gt;char buf[32];int main(int">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="https://Horizoncy.github.io/2019/12/25/hello-world/index.html">
+<meta property="og:title" content="Horizon&#39;s Security Notes">
+<meta property="og:url" content="https://Horizoncy.github.io/2019/12/25/pwnable.kr/index.html">
 <meta property="og:site_name" content="Horizon&#39;s Security Notes">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="pwnable.kr 一个pwn平台.别问我为什么换方向了.刷题记录.雄关漫道真如铁,而今迈步从头越.fd 我们首先看到这道题的C源码：123456789101112131415161718192021#include &amp;lt;stdio.h&amp;gt;#include &amp;lt;stdlib.h&amp;gt;#include &amp;lt;string.h&amp;gt;char buf[32];int main(int">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-10-28T00:39:58.000Z">
+<meta property="og:updated_time" content="2019-11-22T08:46:59.146Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta name="twitter:title" content="Horizon&#39;s Security Notes">
+<meta name="twitter:description" content="pwnable.kr 一个pwn平台.别问我为什么换方向了.刷题记录.雄关漫道真如铁,而今迈步从头越.fd 我们首先看到这道题的C源码：123456789101112131415161718192021#include &amp;lt;stdio.h&amp;gt;#include &amp;lt;stdlib.h&amp;gt;#include &amp;lt;string.h&amp;gt;char buf[32];int main(int">
 
 
 
@@ -119,13 +119,13 @@
 
 
 
-  <link rel="canonical" href="https://Horizoncy.github.io/2019/12/25/hello-world/">
+  <link rel="canonical" href="https://Horizoncy.github.io/2019/12/25/pwnable.kr/">
 
 
 
 
 
-  <title>Hello World | Horizon's Security Notes</title>
+  <title> | Horizon's Security Notes</title>
   
 
 
@@ -294,7 +294,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://Horizoncy.github.io/2019/12/25/hello-world/">
+    <link itemprop="mainEntityOfPage" href="https://Horizoncy.github.io/2019/12/25/pwnable.kr/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Horizon">
@@ -311,7 +311,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hello World</h1>
+          <h1 class="post-title" itemprop="name headline"></h1>
         
 
         <div class="post-meta">
@@ -323,7 +323,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-25T14:03:34+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-25T17:40:15+08:00">
                 2019-12-25
               </time>
             
@@ -361,19 +361,18 @@
       
 
       
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+        <h1 id="pwnable-kr"><a href="#pwnable-kr" class="headerlink" title="pwnable.kr"></a>pwnable.kr</h1><ul>
+<li>一个pwn平台.别问我为什么换方向了.刷题记录.<br>雄关漫道真如铁,而今迈步从头越.<h1 id="fd"><a href="#fd" class="headerlink" title="fd"></a>fd</h1></li>
+<li>我们首先看到这道题的C源码：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;stdlib.h&gt;</span><br><span class="line">#include &lt;string.h&gt;</span><br><span class="line">char buf[32];</span><br><span class="line">int main(int argc, char* argv[], char* envp[])&#123;</span><br><span class="line">        if(argc&lt;2)&#123;</span><br><span class="line">                printf(&quot;pass argv[1] a number\n&quot;);</span><br><span class="line">                return 0;</span><br><span class="line">        &#125;</span><br><span class="line">        int fd = atoi( argv[1] ) - 0x1234;</span><br><span class="line">        int len = 0;</span><br><span class="line">        len = read(fd, buf, 32);</span><br><span class="line">        if(!strcmp(&quot;LETMEWIN\n&quot;, buf))&#123;</span><br><span class="line">                printf(&quot;good job :)\n&quot;);</span><br><span class="line">                system(&quot;/bin/cat flag&quot;);</span><br><span class="line">                exit(0);</span><br><span class="line">        &#125;</span><br><span class="line">        printf(&quot;learn about Linux file IO\n&quot;);</span><br><span class="line">        return 0;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+</li>
+</ul>
+<p>需要得到flag，则需要执行:<code>system(&quot;/bin/cat flag&quot;);</code><br>则 必须 buf = “LETMEWIN”。<br>read(fd, buf, 32)函数中的三个参数中：</p>
+<ul>
+<li>fd == 0时：则表示标准输入；</li>
+<li>fd == 1时：则表示 标准输出；</li>
+<li>fd == 2时，则表示标准输出错误。<br>buf 表示读入的缓冲区；<br>32表示读入32字节；<br>所以我们 只需要 使 fd == 0 ，则我们就能自己输入 LETMEWIN 到 buf中。这样最终得到flag。<br>那么我们就要令<code>argv[1] = 0x1234</code>即 <code>argv[1] = 4660</code>.</li>
+</ul>
 
       
     </div>
@@ -394,6 +393,26 @@
       
       
 
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/25/heap/" rel="next" title>
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/25/pwntools/" rel="prev" title>
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
       
 
       
@@ -467,7 +486,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -504,7 +523,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#pwnable-kr"><span class="nav-number">1.</span> <span class="nav-text">pwnable.kr</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#fd"><span class="nav-number">2.</span> <span class="nav-text">fd</span></a></li></ol></div>
             
 
           </div>

