@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="heap,">
 
 
 
@@ -80,15 +80,16 @@
 
 
 <meta name="description" content="pwn-heap什么是堆在程序运行过程中，堆可以提供动态分配的内存，允许程序申请大小未知的内存。堆其实就是程序虚拟地址空间的一块连续的线性区域，它由低地址向高地址方向增长。我们一般称管理堆的那部分程序为堆管理器. 堆管理器处于用户程序与内核中间，主要做以下工作:  响应用户的申请内存请求，向操作系统申请内存，然后将其返回给用户程序。同时，为了保持内存管理的高效性，内核一般都会预先分配很大的一块连续">
+<meta name="keywords" content="heap">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hexo - heap">
+<meta property="og:title" content="heap">
 <meta property="og:url" content="https://Horizoncy.github.io/2019/12/25/heap/index.html">
 <meta property="og:site_name" content="Horizon&#39;s Security Notes">
 <meta property="og:description" content="pwn-heap什么是堆在程序运行过程中，堆可以提供动态分配的内存，允许程序申请大小未知的内存。堆其实就是程序虚拟地址空间的一块连续的线性区域，它由低地址向高地址方向增长。我们一般称管理堆的那部分程序为堆管理器. 堆管理器处于用户程序与内核中间，主要做以下工作:  响应用户的申请内存请求，向操作系统申请内存，然后将其返回给用户程序。同时，为了保持内存管理的高效性，内核一般都会预先分配很大的一块连续">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-12-25T09:58:46.468Z">
+<meta property="og:updated_time" content="2019-12-25T10:06:22.374Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo - heap">
+<meta name="twitter:title" content="heap">
 <meta name="twitter:description" content="pwn-heap什么是堆在程序运行过程中，堆可以提供动态分配的内存，允许程序申请大小未知的内存。堆其实就是程序虚拟地址空间的一块连续的线性区域，它由低地址向高地址方向增长。我们一般称管理堆的那部分程序为堆管理器. 堆管理器处于用户程序与内核中间，主要做以下工作:  响应用户的申请内存请求，向操作系统申请内存，然后将其返回给用户程序。同时，为了保持内存管理的高效性，内核一般都会预先分配很大的一块连续">
 
 
@@ -125,7 +126,7 @@
 
 
 
-  <title>Hexo - heap | Horizon's Security Notes</title>
+  <title>heap | Horizon's Security Notes</title>
   
 
 
@@ -311,7 +312,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hexo - heap</h1>
+          <h1 class="post-title" itemprop="name headline">heap</h1>
         
 
         <div class="post-meta">
@@ -323,7 +324,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-25T17:40:12+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-25T18:02:12+08:00">
                 2019-12-25
               </time>
             
@@ -669,6 +670,12 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/heap/" rel="tag"># heap</a>
+          
+        </div>
+      
 
       
       
@@ -678,8 +685,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/12/25/bugku/" rel="next" title="Hexo - bugku pwn">
-                <i class="fa fa-chevron-left"></i> Hexo - bugku pwn
+              <a href="/2019/12/25/jwt/" rel="next" title="jwt">
+                <i class="fa fa-chevron-left"></i> jwt
               </a>
             
           </div>
@@ -688,8 +695,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/12/25/pwnable.kr/" rel="prev" title="Hexo - pwnable.kr">
-                Hexo - pwnable.kr <i class="fa fa-chevron-right"></i>
+              <a href="/2019/12/25/http-smuggle/" rel="prev" title="http-smuggle">
+                http-smuggle <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -775,6 +782,15 @@
 
             
 
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
             
 
           </nav>
