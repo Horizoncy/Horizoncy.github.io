@@ -1,6 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>sqli-宽字节注入</title>
+    <url>/2020/02/27/sqli-%E5%AE%BD%E5%AD%97%E8%8A%82%E6%B3%A8%E5%85%A5/</url>
+    <content><![CDATA[<h1 id="0x00背景"><a href="#0x00背景" class="headerlink" title="0x00背景"></a>0x00背景</h1><a id="more"></a>
+<ol>
+<li>当某字符的大小为一个字节时，称其字符为窄字节.</li>
+<li>当某字符的大小为两个字节时，称其字符为宽字节.</li>
+<li>所有英文默认占一个字节，汉字占两个字节</li>
+<li>常见的宽字节编码：GB2312,GBK,GB18030,BIG5,Shift_JIS等等.</li>
+<li>在mysql中，用于转义的函数有addslashes，mysql_real_escape_string，mysql_escape_string等，还有一种情况是magic_quote_gpc，不过高版本的PHP将去除这个特性。<h1 id="0x01-宽字节注入原理"><a href="#0x01-宽字节注入原理" class="headerlink" title="0x01 宽字节注入原理"></a>0x01 宽字节注入原理</h1>程序员为了防止sql注入，对用户输入中的单引号（’）进行处理，在单引号前加上斜杠（\）进行转义，这样被处理后的sql语句中，单引号不再具有‘作用’，仅仅是‘内容’而已，换句话说，这个单引号无法发挥和前后单引号闭合的作用，仅仅成为‘内容‘.</li>
+</ol>
+<p>而安全测试人员要绕过这个转义处理，使单引号发挥作用，有两个思路：</p>
+<ol>
+<li>让斜杠（\）失去作用</li>
+<li>让斜杠（\）消失<h1 id="0x03宽字节注入的前提条件"><a href="#0x03宽字节注入的前提条件" class="headerlink" title="0x03宽字节注入的前提条件"></a>0x03宽字节注入的前提条件</h1>要有宽字节注入漏洞</li>
+</ol>
+<p>1、首先要满足目标程序使用双/多字节字符集进行解析</p>
+<p>2、其次不同字符集范围不一样，可能低位不包含单字节字符集的字符，这样就没办法了，所以要保证在该种字符集范围中包含低字节位，比如 0x5C(01011100) 的字符，即转义符\。</p>
+<p>宽字节带来的安全问题主要是吃ascll字符（一个字节）的现象</p>
+<h1 id="0x04简单的例子"><a href="#0x04简单的例子" class="headerlink" title="0x04简单的例子"></a>0x04简单的例子</h1><p>首先尝试加’:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https://xxxxx?name=hello%27</span><br></pre></td></tr></table></figure>
+
+<p>name值会在js中，但是输入的单引号被转义了，没办法逃逸<br>然后翻看了下页面源码及请求头，发现客户端编码是gbk</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">content-type:charset=gbk</span><br></pre></td></tr></table></figure>
+
+<p>想必是宽字节注入了，尝试输入</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">hello%df%27</span><br></pre></td></tr></table></figure>
+
+<p>没错了，就是宽字节了，console都报错提示引号未闭合了，后面就是构造而外的js代码，并把后面的对于字符注释掉，让语法正确.</p>
+<h1 id="0x05宽字节注入的预防"><a href="#0x05宽字节注入的预防" class="headerlink" title="0x05宽字节注入的预防"></a>0x05宽字节注入的预防</h1><p>最后，网站如何才能防止这种宽字符注入攻击呢？</p>
+<p>（1）使用mysql_set_charset(GBK)指定字符集</p>
+<p>（2）使用mysql_real_escape_string进行转义</p>
+<p>原理是，mysql_real_escape_string与addslashes的不同之处在于其会考虑当前设置的字符集，不会出现前面e5和5c拼接为一个宽字节的问题，但是这个“当前字符集”如何确定呢？就是使用mysql_set_charset进行指定。</p>
+]]></content>
+      <tags>
+        <tag>web</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>buuctf real writeup</title>
     <url>/2020/02/13/buuctf%20real%20writeup/</url>
     <content><![CDATA[<h1 id="PHP-XXE"><a href="#PHP-XXE" class="headerlink" title="[PHP]XXE"></a>[PHP]XXE</h1><a id="more"></a>
