@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="0x00背景">
+<meta name="description" content="mysql盲注常用函数">
 <meta name="keywords" content="web">
 <meta property="og:type" content="article">
-<meta property="og:title" content="sqli-宽字节注入">
-<meta property="og:url" content="https://Horizoncy.github.io/2020/02/27/sqli-宽字节注入/index.html">
+<meta property="og:title" content="mysql盲注常用函数">
+<meta property="og:url" content="https://Horizoncy.github.io/2020/03/02/mysql盲注常用函数/index.html">
 <meta property="og:site_name" content="Horizon&#39;s Security Notes">
-<meta property="og:description" content="0x00背景">
+<meta property="og:description" content="mysql盲注常用函数">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-02-27T09:53:19.286Z">
+<meta property="og:updated_time" content="2020-03-02T06:33:18.197Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="sqli-宽字节注入">
-<meta name="twitter:description" content="0x00背景">
+<meta name="twitter:title" content="mysql盲注常用函数">
+<meta name="twitter:description" content="mysql盲注常用函数">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https://Horizoncy.github.io/2020/02/27/sqli-宽字节注入/">
+  <link rel="canonical" href="https://Horizoncy.github.io/2020/03/02/mysql盲注常用函数/">
 
 
 
 
 
-  <title>sqli-宽字节注入 | Horizon's Security Notes</title>
+  <title>mysql盲注常用函数 | Horizon's Security Notes</title>
   
 
 
@@ -285,7 +285,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://Horizoncy.github.io/2020/02/27/sqli-宽字节注入/">
+    <link itemprop="mainEntityOfPage" href="https://Horizoncy.github.io/2020/03/02/mysql盲注常用函数/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Horizon">
@@ -302,7 +302,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">sqli-宽字节注入</h1>
+          <h1 class="post-title" itemprop="name headline">mysql盲注常用函数</h1>
         
 
         <div class="post-meta">
@@ -314,8 +314,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-27T17:53:20+08:00">
-                2020-02-27
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-02T14:32:20+08:00">
+                2020-03-02
               </time>
             
 
@@ -352,36 +352,42 @@
       
 
       
-        <h1 id="0x00背景"><a href="#0x00背景" class="headerlink" title="0x00背景"></a>0x00背景</h1><a id="more"></a>
-<ol>
-<li>当某字符的大小为一个字节时，称其字符为窄字节.</li>
-<li>当某字符的大小为两个字节时，称其字符为宽字节.</li>
-<li>所有英文默认占一个字节，汉字占两个字节</li>
-<li>常见的宽字节编码：GB2312,GBK,GB18030,BIG5,Shift_JIS等等.</li>
-<li>在mysql中，用于转义的函数有addslashes，mysql_real_escape_string，mysql_escape_string等，还有一种情况是magic_quote_gpc，不过高版本的PHP将去除这个特性。<h1 id="0x01-宽字节注入原理"><a href="#0x01-宽字节注入原理" class="headerlink" title="0x01 宽字节注入原理"></a>0x01 宽字节注入原理</h1>程序员为了防止sql注入，对用户输入中的单引号（’）进行处理，在单引号前加上斜杠（\）进行转义，这样被处理后的sql语句中，单引号不再具有‘作用’，仅仅是‘内容’而已，换句话说，这个单引号无法发挥和前后单引号闭合的作用，仅仅成为‘内容‘.</li>
-</ol>
-<p>而安全测试人员要绕过这个转义处理，使单引号发挥作用，有两个思路：</p>
-<ol>
-<li>让斜杠（\）失去作用</li>
-<li>让斜杠（\）消失<h1 id="0x03宽字节注入的前提条件"><a href="#0x03宽字节注入的前提条件" class="headerlink" title="0x03宽字节注入的前提条件"></a>0x03宽字节注入的前提条件</h1>要有宽字节注入漏洞</li>
-</ol>
-<p>1、首先要满足目标程序使用双/多字节字符集进行解析</p>
-<p>2、其次不同字符集范围不一样，可能低位不包含单字节字符集的字符，这样就没办法了，所以要保证在该种字符集范围中包含低字节位，比如 0x5C(01011100) 的字符，即转义符\。</p>
-<p>宽字节带来的安全问题主要是吃ascll字符（一个字节）的现象</p>
-<h1 id="0x04简单的例子"><a href="#0x04简单的例子" class="headerlink" title="0x04简单的例子"></a>0x04简单的例子</h1><p>首先尝试加’:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://xxxxx?name=hello%27</span><br></pre></td></tr></table></figure>
+        <h1 id="mysql盲注常用函数"><a href="#mysql盲注常用函数" class="headerlink" title="mysql盲注常用函数"></a>mysql盲注常用函数</h1><a id="more"></a>
+<h2 id="char-length-str-length-str"><a href="#char-length-str-length-str" class="headerlink" title="char_length(str),length(str)"></a>char_length(str),length(str)</h2><p>计算字符长度</p>
+<p>eg:select length(database());</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select database();</span><br><span class="line">+------------+</span><br><span class="line">| database() |</span><br><span class="line">+------------+</span><br><span class="line">| django     |</span><br><span class="line">+------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; select length(database());</span><br><span class="line">+--------------------+</span><br><span class="line">| length(database()) |</span><br><span class="line">+--------------------+</span><br><span class="line">|                  6 |</span><br><span class="line">+--------------------+</span><br><span class="line">1 row in set (0.24 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; select length(database())&gt;6;</span><br><span class="line">+----------------------+</span><br><span class="line">| length(database())&gt;6 |</span><br><span class="line">+----------------------+</span><br><span class="line">|                    0 |</span><br><span class="line">+----------------------+</span><br></pre></td></tr></table></figure>
 
-<p>name值会在js中，但是输入的单引号被转义了，没办法逃逸<br>然后翻看了下页面源码及请求头，发现客户端编码是gbk</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">content-type:charset=gbk</span><br></pre></td></tr></table></figure>
+<h2 id="1-row-in-set-0-05-sec"><a href="#1-row-in-set-0-05-sec" class="headerlink" title="1 row in set (0.05 sec)"></a>1 row in set (0.05 sec)</h2><p>left(str,numbers)<br>从左开始截取字符串strnumber个字符</p>
+<p>eg: select left(database(),2);</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select database();</span><br><span class="line">+------------+</span><br><span class="line">| database() |</span><br><span class="line">+------------+</span><br><span class="line">| django     |</span><br><span class="line">+------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line">mysql&gt; select left(database(),2);</span><br><span class="line">+--------------------+</span><br><span class="line">| left(database(),2) |</span><br><span class="line">+--------------------+</span><br><span class="line">| dj                 |</span><br><span class="line">+--------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line">mysql&gt; select left(database(),2)=&apos;dj&apos;;</span><br><span class="line">+-------------------------+</span><br><span class="line">| left(database(),2)=&apos;dj&apos; |</span><br><span class="line">+-------------------------+</span><br><span class="line">|                       1 |</span><br><span class="line">+-------------------------+</span><br><span class="line">1 row in set (0.10 sec)</span><br><span class="line">mysql&gt; select left(database(),2)=&apos;q&apos;;</span><br><span class="line">+------------------------+</span><br><span class="line">| left(database(),2)=&apos;q&apos; |</span><br><span class="line">+------------------------+</span><br><span class="line">|                      0 |</span><br><span class="line">+------------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
 
-<p>想必是宽字节注入了，尝试输入</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hello%df%27</span><br></pre></td></tr></table></figure>
+<h2 id="substring-str-start-number-substr-str-start-number"><a href="#substring-str-start-number-substr-str-start-number" class="headerlink" title="substring(str,start,number),substr(str,start,number)"></a>substring(str,start,number),substr(str,start,number)</h2><p>从start开始位置取出number个字符</p>
+<p>eg:select substr((select database()),1,1);</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select database();</span><br><span class="line">+------------+</span><br><span class="line">| database() |</span><br><span class="line">+------------+</span><br><span class="line">| django     |</span><br><span class="line">+------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line">mysql&gt; select substr((select database()),1,1);</span><br><span class="line">+---------------------------------+</span><br><span class="line">| substr((select database()),1,1) |</span><br><span class="line">+---------------------------------+</span><br><span class="line">| d                               |</span><br><span class="line">+---------------------------------+</span><br><span class="line">1 row in set (0.43 sec)</span><br><span class="line">mysql&gt; select substr((select database()),1,1)=&apos;a&apos;;</span><br><span class="line">+-------------------------------------+</span><br><span class="line">| substr((select database()),1,1)=&apos;a&apos; |</span><br><span class="line">+-------------------------------------+</span><br><span class="line">|                                   0 |</span><br><span class="line">+-------------------------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line">mysql&gt; select substr((select database()),1,1)=&apos;d&apos;;</span><br><span class="line">+-------------------------------------+</span><br><span class="line">| substr((select database()),1,1)=&apos;d&apos; |</span><br><span class="line">+-------------------------------------+</span><br><span class="line">|                                   1 |</span><br><span class="line">+-------------------------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
 
-<p>没错了，就是宽字节了，console都报错提示引号未闭合了，后面就是构造而外的js代码，并把后面的对于字符注释掉，让语法正确.</p>
-<h1 id="0x05宽字节注入的预防"><a href="#0x05宽字节注入的预防" class="headerlink" title="0x05宽字节注入的预防"></a>0x05宽字节注入的预防</h1><p>最后，网站如何才能防止这种宽字符注入攻击呢？</p>
-<p>（1）使用mysql_set_charset(GBK)指定字符集</p>
-<p>（2）使用mysql_real_escape_string进行转义</p>
-<p>原理是，mysql_real_escape_string与addslashes的不同之处在于其会考虑当前设置的字符集，不会出现前面e5和5c拼接为一个宽字节的问题，但是这个“当前字符集”如何确定呢？就是使用mysql_set_charset进行指定。</p>
+<h2 id="mid-str-start-number"><a href="#mid-str-start-number" class="headerlink" title="mid(str,start,number)"></a>mid(str,start,number)</h2><p>从start开始位置取出number个字符</p>
+<p>eg:select mid(database(),1,1);</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select database();</span><br><span class="line">+------------+</span><br><span class="line">| database() |</span><br><span class="line">+------------+</span><br><span class="line">| django     |</span><br><span class="line">+------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line">mysql&gt; select mid(database(),1,1);</span><br><span class="line">+---------------------+</span><br><span class="line">| mid(database(),1,1) |</span><br><span class="line">+---------------------+</span><br><span class="line">| d                   |</span><br><span class="line">+---------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line">mysql&gt; select mid(database(),2,2);</span><br><span class="line">+---------------------+</span><br><span class="line">| mid(database(),2,2) |</span><br><span class="line">+---------------------+</span><br><span class="line">| ja                  |</span><br><span class="line">+---------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<h2 id="ord-str"><a href="#ord-str" class="headerlink" title="ord(str)"></a>ord(str)</h2><p>字符串第一位字符的ascii码</p>
+<p>eg:select ord(database());</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select database();</span><br><span class="line">+------------+</span><br><span class="line">| database() |</span><br><span class="line">+------------+</span><br><span class="line">| django     |</span><br><span class="line">+------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line">mysql&gt; select ord(database());</span><br><span class="line">+-----------------+</span><br><span class="line">| ord(database()) |</span><br><span class="line">+-----------------+</span><br><span class="line">|             100 |</span><br><span class="line">+-----------------+</span><br><span class="line">1 row in set (0.43 sec)</span><br><span class="line">mysql&gt; select ord(&apos;a&apos;);</span><br><span class="line">+----------+</span><br><span class="line">| ord(&apos;a&apos;) |</span><br><span class="line">+----------+</span><br><span class="line">|       97 |</span><br><span class="line">+----------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line">mysql&gt; select ord(database())=100;</span><br><span class="line">+---------------------+</span><br><span class="line">| ord(database())=100 |</span><br><span class="line">+---------------------+</span><br><span class="line">|                   1 |</span><br><span class="line">+---------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line">mysql&gt; select ord(database())=0;</span><br><span class="line">+-------------------+</span><br><span class="line">| ord(database())=0 |</span><br><span class="line">+-------------------+</span><br><span class="line">|                 0 |</span><br><span class="line">+-------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<h2 id="ascii-str"><a href="#ascii-str" class="headerlink" title="ascii(str)"></a>ascii(str)</h2><p>取出最左侧的第一位字符的ascii码</p>
+<p>eg:select ascii(database());</p>
+<p>基本上同ord()函数.</p>
+<h2 id="limit-m-n-限制输出"><a href="#limit-m-n-限制输出" class="headerlink" title="limit m ,n 限制输出"></a>limit m ,n 限制输出</h2><p>从第m(m从0开始)位字符开始取出n个字符</p>
+<p>eg:select username from users limit 0,1;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select name from login_user;</span><br><span class="line">+---------+</span><br><span class="line">| name    |</span><br><span class="line">+---------+</span><br><span class="line">| HORIZON |</span><br><span class="line">| lenovo  |</span><br><span class="line">| tbw     |</span><br><span class="line">+---------+</span><br><span class="line">3 rows in set (0.38 sec)</span><br><span class="line">mysql&gt; select name from login_user limit 0,1;</span><br><span class="line">+---------+</span><br><span class="line">| name    |</span><br><span class="line">+---------+</span><br><span class="line">| HORIZON |</span><br><span class="line">+---------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line">mysql&gt; select name from login_user limit 2,2;</span><br><span class="line">+------+</span><br><span class="line">| name |</span><br><span class="line">+------+</span><br><span class="line">| tbw  |</span><br><span class="line">+------+</span><br><span class="line">1 row in set (0.00 sec)</span><br><span class="line">mysql&gt; select name from login_user limit 0,2;</span><br><span class="line">+---------+</span><br><span class="line">| name    |</span><br><span class="line">+---------+</span><br><span class="line">| HORIZON |</span><br><span class="line">| lenovo  |</span><br><span class="line">+---------+</span><br><span class="line">2 rows in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<h2 id="updatexml-XML-document-XPath-string-new-value"><a href="#updatexml-XML-document-XPath-string-new-value" class="headerlink" title="updatexml(XML_document,XPath_string,new_value)"></a>updatexml(XML_document,XPath_string,new_value)</h2><p>updatexml()函数只截取了特殊字符以后的字符,这时就需要构造特殊字符如反引号:`,波浪号:~,再将查询的结果结合这些特殊字符就会从最开始的特殊字符(包括特殊字符)开始截取,最大32位</p>
+<p>eg:select updatexml(1,concat(‘<del>‘,(select database()),’</del>‘),1);</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select updatexml(1,concat(&apos;~&apos;,(select database()),&apos;~&apos;),1);</span><br><span class="line">ERROR 1105 (HY000): XPATH syntax error: &apos;~django~&apos;</span><br></pre></td></tr></table></figure>
+
+<h2 id="count"><a href="#count" class="headerlink" title="count (*)"></a>count (*)</h2><p> 计算数量</p>
+<p>eg:select count(*) from users;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select schema_name from information_schema.schemata;</span><br><span class="line">+---------------------------+</span><br><span class="line">| SCHEMA_NAME               |</span><br><span class="line">+---------------------------+</span><br><span class="line">| mysql                     |</span><br><span class="line">| information_schema        |</span><br><span class="line">| performance_schema        |</span><br><span class="line">| sys                       |</span><br><span class="line">| django                    |</span><br><span class="line">| ssh                       |</span><br><span class="line">| jspmlsgswhsg5576b2b6mysql |</span><br><span class="line">+---------------------------+</span><br><span class="line">7 rows in set (0.11 sec)</span><br><span class="line">mysql&gt; select count(*) from information_schema.schemata;</span><br><span class="line">+----------+</span><br><span class="line">| count(*) |</span><br><span class="line">+----------+</span><br><span class="line">|        7 |</span><br><span class="line">+----------+</span><br><span class="line">1 row in set (0.14 sec)</span><br></pre></td></tr></table></figure>
+
 
       
     </div>
@@ -412,8 +418,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/02/13/buuctf real writeup/" rel="next" title="buuctf real writeup">
-                <i class="fa fa-chevron-left"></i> buuctf real writeup
+              <a href="/2020/02/27/sqli-宽字节注入/" rel="next" title="sqli-宽字节注入">
+                <i class="fa fa-chevron-left"></i> sqli-宽字节注入
               </a>
             
           </div>
@@ -421,10 +427,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/03/02/mysql盲注常用函数/" rel="prev" title="mysql盲注常用函数">
-                mysql盲注常用函数 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -567,7 +569,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x00背景"><span class="nav-number">1.</span> <span class="nav-text">0x00背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x01-宽字节注入原理"><span class="nav-number">2.</span> <span class="nav-text">0x01 宽字节注入原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x03宽字节注入的前提条件"><span class="nav-number">3.</span> <span class="nav-text">0x03宽字节注入的前提条件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04简单的例子"><span class="nav-number">4.</span> <span class="nav-text">0x04简单的例子</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x05宽字节注入的预防"><span class="nav-number">5.</span> <span class="nav-text">0x05宽字节注入的预防</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mysql盲注常用函数"><span class="nav-number">1.</span> <span class="nav-text">mysql盲注常用函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#char-length-str-length-str"><span class="nav-number">1.1.</span> <span class="nav-text">char_length(str),length(str)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-row-in-set-0-05-sec"><span class="nav-number">1.2.</span> <span class="nav-text">1 row in set (0.05 sec)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#substring-str-start-number-substr-str-start-number"><span class="nav-number">1.3.</span> <span class="nav-text">substring(str,start,number),substr(str,start,number)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mid-str-start-number"><span class="nav-number">1.4.</span> <span class="nav-text">mid(str,start,number)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ord-str"><span class="nav-number">1.5.</span> <span class="nav-text">ord(str)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ascii-str"><span class="nav-number">1.6.</span> <span class="nav-text">ascii(str)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#limit-m-n-限制输出"><span class="nav-number">1.7.</span> <span class="nav-text">limit m ,n 限制输出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#updatexml-XML-document-XPath-string-new-value"><span class="nav-number">1.8.</span> <span class="nav-text">updatexml(XML_document,XPath_string,new_value)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#count"><span class="nav-number">1.9.</span> <span class="nav-text">count (*)</span></a></li></ol></li></ol></div>
             
 
           </div>
