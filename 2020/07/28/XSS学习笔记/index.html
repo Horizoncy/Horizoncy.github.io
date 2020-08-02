@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="0x00 用途盗取cookie信息 水坑探针 挖矿 蠕虫 沙盒逃逸 代理 信息收集ajax get current page dataget gateway infoall linkscookiesteal login info 0x01 验证  12&amp;lt;script&amp;gt;alert(1)&amp;lt;/script&amp;gt; &amp;lt;img src=1 oneerro=alert(2)&amp;gt;">
+<meta name="description" content="0x00 用途">
 <meta name="keywords" content="web">
 <meta property="og:type" content="article">
 <meta property="og:title" content="XSS学习笔记">
 <meta property="og:url" content="https://Horizoncy.github.io/2020/07/28/XSS学习笔记/index.html">
 <meta property="og:site_name" content="Horizon&#39;s Security Notes">
-<meta property="og:description" content="0x00 用途盗取cookie信息 水坑探针 挖矿 蠕虫 沙盒逃逸 代理 信息收集ajax get current page dataget gateway infoall linkscookiesteal login info 0x01 验证  12&amp;lt;script&amp;gt;alert(1)&amp;lt;/script&amp;gt; &amp;lt;img src=1 oneerro=alert(2)&amp;gt;">
+<meta property="og:description" content="0x00 用途">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-08-02T13:52:43.147Z">
+<meta property="og:updated_time" content="2020-08-02T14:18:34.382Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="XSS学习笔记">
-<meta name="twitter:description" content="0x00 用途盗取cookie信息 水坑探针 挖矿 蠕虫 沙盒逃逸 代理 信息收集ajax get current page dataget gateway infoall linkscookiesteal login info 0x01 验证  12&amp;lt;script&amp;gt;alert(1)&amp;lt;/script&amp;gt; &amp;lt;img src=1 oneerro=alert(2)&amp;gt;">
+<meta name="twitter:description" content="0x00 用途">
 
 
 
@@ -383,7 +383,8 @@
       
 
       
-        <h1 id="0x00-用途"><a href="#0x00-用途" class="headerlink" title="0x00 用途"></a>0x00 用途</h1><h1 id="盗取cookie信息-水坑探针-挖矿-蠕虫-沙盒逃逸-代理-信息收集"><a href="#盗取cookie信息-水坑探针-挖矿-蠕虫-沙盒逃逸-代理-信息收集" class="headerlink" title="盗取cookie信息 水坑探针 挖矿 蠕虫 沙盒逃逸 代理 信息收集"></a>盗取cookie信息 水坑探针 挖矿 蠕虫 沙盒逃逸 代理 信息收集</h1><p>ajax get current page data<br>get gateway info<br>all links<br>cookie<br>steal login info 0x01 验证 </p>
+        <h1 id="0x00-用途"><a href="#0x00-用途" class="headerlink" title="0x00 用途"></a>0x00 用途</h1><a id="more"></a>
+<p>盗取cookie信息 水坑探针 挖矿 蠕虫 沙盒逃逸 代理 信息收集<br>ajax get current page data<br>get gateway info<br>all links<br>cookie<br>steal login info 0x01 验证 </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;alert(1)&lt;/script&gt; </span><br><span class="line">&lt;img src=1 oneerro=alert(2)&gt;</span><br></pre></td></tr></table></figure>
 
 <h1 id="confirm-console-log-0x02-cookie"><a href="#confirm-console-log-0x02-cookie" class="headerlink" title="confirm console.log 0x02 cookie"></a>confirm console.log 0x02 cookie</h1><p>http头Set-Cookie在浏览器中设置cookie<br>再次请求时，request便会携带cookie<br>以文本形式存放在浏览器目录下：%APPDATA%\Microsoft\Windows\Cookies<br>发起http请求时，浏览器会检查是否有相应cookie，有着将相应的cookie添加到请求头<br>获取cookie值：document.cookie（只能获取非httponly的值）<br>格式；key=value。两组之间以:[ ]隔开。<br>cookie属性：expires、domain、 path、secure、HttpOnly。<br>过期时间，域名+路径=url符合发送cookie。<br>ps： <strong>xhr请求：浏览器不会自动添加cookie。</strong> </p>
@@ -880,7 +881,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x00-用途"><span class="nav-number">1.</span> <span class="nav-text">0x00 用途</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#盗取cookie信息-水坑探针-挖矿-蠕虫-沙盒逃逸-代理-信息收集"><span class="nav-number">2.</span> <span class="nav-text">盗取cookie信息 水坑探针 挖矿 蠕虫 沙盒逃逸 代理 信息收集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#confirm-console-log-0x02-cookie"><span class="nav-number">3.</span> <span class="nav-text">confirm console.log 0x02 cookie</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#secure是在安全环境下才会将cookie进行发送，比如https。证书要被认可。"><span class="nav-number">4.</span> <span class="nav-text">secure是在安全环境下才会将cookie进行发送，比如https。证书要被认可。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-cookie操作"><span class="nav-number">5.</span> <span class="nav-text">0x04 cookie操作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#修改cookie：直接赋值即可，但是要注意path-domain的一致性，否则不会修改，而是添加一个新cookie。"><span class="nav-number">6.</span> <span class="nav-text">修改cookie：直接赋值即可，但是要注意path/domain的一致性，否则不会修改，而是添加一个新cookie。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x06-xss基础"><span class="nav-number">7.</span> <span class="nav-text">0x06 xss基础</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#反射型：恶意代码存在于url中。点击才会触发，隐蔽性较差。"><span class="nav-number">8.</span> <span class="nav-text">反射型：恶意代码存在于url中。点击才会触发，隐蔽性较差。</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-JSONP"><span class="nav-number">8.1.</span> <span class="nav-text">1.JSONP</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x00-用途"><span class="nav-number">1.</span> <span class="nav-text">0x00 用途</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#confirm-console-log-0x02-cookie"><span class="nav-number">2.</span> <span class="nav-text">confirm console.log 0x02 cookie</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#secure是在安全环境下才会将cookie进行发送，比如https。证书要被认可。"><span class="nav-number">3.</span> <span class="nav-text">secure是在安全环境下才会将cookie进行发送，比如https。证书要被认可。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-cookie操作"><span class="nav-number">4.</span> <span class="nav-text">0x04 cookie操作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#修改cookie：直接赋值即可，但是要注意path-domain的一致性，否则不会修改，而是添加一个新cookie。"><span class="nav-number">5.</span> <span class="nav-text">修改cookie：直接赋值即可，但是要注意path/domain的一致性，否则不会修改，而是添加一个新cookie。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x06-xss基础"><span class="nav-number">6.</span> <span class="nav-text">0x06 xss基础</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#反射型：恶意代码存在于url中。点击才会触发，隐蔽性较差。"><span class="nav-number">7.</span> <span class="nav-text">反射型：恶意代码存在于url中。点击才会触发，隐蔽性较差。</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-JSONP"><span class="nav-number">7.1.</span> <span class="nav-text">1.JSONP</span></a></li></ol></li></ol></div>
             
 
           </div>

